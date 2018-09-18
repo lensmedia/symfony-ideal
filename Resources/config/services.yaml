@@ -1,0 +1,20 @@
+services:
+    Lens\Bundle\IdealBundle\Request\Request:
+        abstract: true
+        arguments: [[]]
+
+    Lens\Bundle\IdealBundle\Request\DirectoryReq:
+        parent: Lens\Bundle\IdealBundle\Request\Request
+
+    Lens\Bundle\IdealBundle\Request\AcquirerTrxReq:
+        parent: Lens\Bundle\IdealBundle\Request\Request
+
+    Lens\Bundle\IdealBundle\Request\AcquirerStatusReq:
+        parent: Lens\Bundle\IdealBundle\Request\Request
+
+    Lens\Bundle\IdealBundle\Form\IdealDirectoryType:
+        autoconfigure: true
+        autowire: true
+        tags:
+            - { name: form.type, extended_type: Symfony\Component\Form\Extension\Core\Type\ChoiceType }
+
