@@ -64,7 +64,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Private certificate file name')
                 ->end()
                 ->scalarNode('public_certificate_file')
-                    ->cannotBeEmpty()
+                    ->defaultNull()
                     ->info('Public certificate file name')
                 ->end()
                 ->scalarNode('private_key_pass')
