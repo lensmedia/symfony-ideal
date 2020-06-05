@@ -1,18 +1,19 @@
 {
-	"name": "lens/ideal",
-	"description": "Bundle for handeling iDeal transactions",
-	"type": "symfony-bundle",
-	"license": "proprietary",
-	"require": {
-		"php": "^7.1",
-		"robrichards/xmlseclibs": "^3.0",
-		"symfony/cache": "^3.1",
-		"symfony/framework-bundle": "^3.3",
-		"symfony/yaml": "*"
-	},
-	"autoload": {
-		"psr-4": {
-			"Lens\\Bundle\\IdealBundle": ""
-		}
-	}
+    "name": "lens/ideal",
+    "description": "Bundle for handeling iDeal transactions",
+    "type": "symfony-bundle",
+    "license": "proprietary",
+    "require": {
+        "php": "^7.1",
+        "robrichards/xmlseclibs": "*",
+        "symfony/cache": "^5",
+        "symfony/framework-bundle": "^5",
+        "symfony/http-client": "^5",
+        "symfony/yaml": "^5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lens\\Bundle\\IdealBundle": ""
+        }
+    }
 }

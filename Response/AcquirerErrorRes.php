@@ -3,7 +3,6 @@
 namespace Lens\Bundle\IdealBundle\Response;
 
 use SimpleXMLElement;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
 /**
  * IX Invalid XML and all related problems. Such as incorrect encoding, invalid version, otherwise unreadable.
@@ -50,9 +49,9 @@ final class AcquirerErrorRes extends IdealResponse
         'AP2920' => 'Expiration period is not valid',
     ];
 
-    protected function __construct(int $status, HeaderBag $headers, SimpleXMLElement $content)
+    protected function __construct(int $status, array $info, SimpleXMLElement $content)
     {
-        parent::__construct($status, $headers, $content);
+        parent::__construct($status, $info, $content);
     }
 
     public function errorCode(): string

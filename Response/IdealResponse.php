@@ -4,26 +4,43 @@ namespace Lens\Bundle\IdealBundle\Response;
 
 use DateTimeImmutable;
 use Exception;
+use Lens\Bundle\IdealBundle\Exception\IdealErrorResponseException;
+use Serializable;
 use SimpleXMLElement;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
-abstract class IdealResponse implements IdealResponseInterface
+abstract class IdealResponse implements IdealResponseInterface, Serializable
 {
     protected $status;
-    protected $headers;
+    protected $info;
     protected $content;
 
-    protected function __construct(int $status, HeaderBag $headers, SimpleXMLElement $content)
+    protected function __construct(int $status, array $info, SimpleXMLElement $content)
     {
         $this->status = $status;
-        $this->headers = $headers;
+        $this->info = $info;
         $this->content = $content;
     }
 
-    public static function create(int $status, array $headers, string $content)
+    public function serialize(): string
     {
-        $headers = new HeaderBag($headers);
+        return serialize([
+            'status' => $this->status,
+            'info' => $this->info,
+            'content' => $this->content ? $this->content->asXML() : null,
+        ]);
+    }
 
+    public function unserialize($serialized): void
+    {
+        $data = unserialize($serialized);
+
+        $this->status = $data['status'];
+        $this->info = $data['info'];
+        $this->content = $data['content'] ? simplexml_load_string($data['content']) : null;
+    }
+
+    public static function create(int $status, array $info, string $content)
+    {
         if (false === ($content = @simplexml_load_string($content))) {
             throw new Exception('Response does not seem to contain valid XML.');
         }
@@ -36,12 +53,23 @@ abstract class IdealResponse implements IdealResponseInterface
             ));
         }
 
-        $instance = new $class($status, $headers, $content);
-        if (($instance instanceof AcquirerStatusRes) && ('Success' !== $instance->status())) {
-            throw self::createTransactionException($instance);
+        $instance = new $class($status, $info, $content);
+
+        // See if we got an error response from the api.
+        $caseStatusError = $instance instanceof AcquirerStatusRes && 'Success' !== $instance->status();
+        $caseErrorResponse = $instance instanceof AcquirerErrorRes;
+        if ($caseErrorResponse || $caseStatusError) {
+            throw $caseStatusError
+                ? self::createTransactionException($instance)
+                : self::createException($instance);
         }
 
         return $instance;
+    }
+
+    private static function createException(AcquirerErrorRes $response): Exception
+    {
+        return new IdealErrorResponseException($response);
     }
 
     private static function createTransactionException(AcquirerStatusRes $response): Exception
@@ -49,7 +77,7 @@ abstract class IdealResponse implements IdealResponseInterface
         $namespace = explode('\\', __NAMESPACE__);
         array_pop($namespace);
 
-        $exception = '\\'.implode('\\', $namespace).'\\Exception\\IdealTransaction'.$response->status().'Exception';
+        $exception = '\\'.implode('\\', $namespace).'\\Exception\\IdealTransaction'.ucfirst($response->status()).'Exception';
         if (!class_exists($exception)) {
             throw new Exception(sprintf(
                 "Unsupported status detected '%s', aborting.",

@@ -8,7 +8,9 @@ final class DirectoryReq extends IdealRequest
 {
     public function message(IdealRequestOptions $options): DOMDocument
     {
-        return DOMDocument::loadXML('
+        $document = new DOMDocument();
+
+        $document->loadXML('
             <DirectoryReq xmlns="http://www.idealdesk.com/ideal/messages/mer-acq/3.3.1" version="3.3.1">
                 <createDateTimestamp>'.$this->timestamp().'</createDateTimestamp>
                 <Merchant>
@@ -17,5 +19,7 @@ final class DirectoryReq extends IdealRequest
                 </Merchant>
             </DirectoryReq>
         ');
+
+        return $document;
     }
 }

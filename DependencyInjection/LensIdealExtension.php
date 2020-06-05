@@ -2,7 +2,7 @@
 
 namespace Lens\Bundle\IdealBundle\DependencyInjection;
 
-use Lens\Bundle\IdealBundle\Request\Request;
+use Lens\Bundle\IdealBundle\Request\IdealRequest;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -29,7 +29,7 @@ class LensIdealExtension extends Extension
 
         $loader->load('services.yaml');
 
-        $issuer = $container->getDefinition(Request::class);
-        $issuer->replaceArgument(0, $config);
+        $issuer = $container->getDefinition(IdealRequest::class);
+        $issuer->replaceArgument(1, $config);
     }
 }

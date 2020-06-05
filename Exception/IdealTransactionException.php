@@ -5,7 +5,7 @@ namespace Lens\Bundle\IdealBundle\Exception;
 use Exception;
 use Lens\Bundle\IdealBundle\Response\AcquirerStatusRes;
 
-abstract class IdealTransactionException extends Exception
+abstract class IdealTransactionException extends IdealException
 {
     private $response;
 

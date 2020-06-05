@@ -2,16 +2,15 @@
 
 namespace Lens\Bundle\IdealBundle\Exception;
 
-use Exception;
 use Lens\Bundle\IdealBundle\Response\AcquirerErrorRes;
 
-class IdealErrorResponseException extends Exception
+class IdealErrorResponseException extends IdealException
 {
     private $error;
 
     public function __construct(AcquirerErrorRes $error)
     {
-        parent::__construct($error->consumerMessage(), 0);
+        parent::__construct('['.$error->errorCode().'] '.$error->errorMessage().' - '.$error->errorDetail(), 0);
 
         $this->error = $error;
     }
@@ -29,6 +28,11 @@ class IdealErrorResponseException extends Exception
     public function getErrorDescription(): string
     {
         return AcquirerErrorRes::ERROR_DESCRIPTIONS[$this->error->errorCode()];
+    }
+
+    public function getConsumerMessage(): string
+    {
+        return $this->error->consumerMessage();
     }
 
     public function __toString()

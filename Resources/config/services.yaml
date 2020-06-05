@@ -1,20 +1,27 @@
 services:
-    Lens\Bundle\IdealBundle\Request\Request:
+    Lens\Bundle\IdealBundle\Request\IdealRequest:
         abstract: true
-        arguments: [[]]
+        arguments: [ '@Symfony\Contracts\HttpClient\HttpClientInterface', []]
 
-    Lens\Bundle\IdealBundle\Request\DirectoryReq:
-        parent: Lens\Bundle\IdealBundle\Request\Request
-
-    Lens\Bundle\IdealBundle\Request\AcquirerTrxReq:
-        parent: Lens\Bundle\IdealBundle\Request\Request
-
-    Lens\Bundle\IdealBundle\Request\AcquirerStatusReq:
-        parent: Lens\Bundle\IdealBundle\Request\Request
-
-    Lens\Bundle\IdealBundle\Form\IdealDirectoryType:
+    Lens\Bundle\IdealBundle\Ideal:
         autoconfigure: true
         autowire: true
+
+    Lens\Bundle\IdealBundle\Request\DirectoryReq:
+        parent: Lens\Bundle\IdealBundle\Request\IdealRequest
+
+    Lens\Bundle\IdealBundle\Request\AcquirerTrxReq:
+        parent: Lens\Bundle\IdealBundle\Request\IdealRequest
+
+    Lens\Bundle\IdealBundle\Request\AcquirerStatusReq:
+        parent: Lens\Bundle\IdealBundle\Request\IdealRequest
+
+    Lens\Bundle\IdealBundle\Form\Type\IdealIssuerType:
+        arguments: [ '@Lens\Bundle\IdealBundle\Ideal' ]
         tags:
             - { name: form.type, extended_type: Symfony\Component\Form\Extension\Core\Type\ChoiceType }
 
+    Lens\Bundle\IdealBundle\Validator\Constraints\IdealIssuerValidator:
+        arguments: [ '@Lens\Bundle\IdealBundle\Ideal' ]
+        tags:
+            - { name: validator.constraint_validator }
