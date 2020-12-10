@@ -13,27 +13,28 @@ final class AcquirerTrxRes extends IdealResponse
      */
     public function acquirer(): string
     {
-        return (string) $this->content->Acquirer->acquirerID;
+        return (string)$this->content->Acquirer->acquirerID;
     }
 
     /**
-     * Target URL for the actual transaction handeling (redirect to selected bank).
+     * Target URL for the actual transaction handeling (redirect to selected
+     * bank).
      *
      * @return string
      */
     public function url(): string
     {
-        return (string) $this->content->Issuer->issuerAuthenticationURL;
+        return (string)$this->content->Issuer->issuerAuthenticationURL;
     }
 
     public function transaction(): string
     {
-        return (string) $this->content->Transaction->transactionID;
+        return (string)$this->content->Transaction->transactionID;
     }
 
     public function purchase(): string
     {
-        return (string) $this->content->Transaction->purchaseID;
+        return (string)$this->content->Transaction->purchaseID;
     }
 
     public function transactionTimestamp(): DateTimeImmutable

@@ -5,6 +5,7 @@ namespace Lens\Bundle\IdealBundle\DependencyInjection;
 use Lens\Bundle\IdealBundle\Request\IdealRequest;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -21,13 +22,8 @@ class LensIdealExtension extends Extension
         );
         $config = $this->processConfiguration($configuration, $configs);
 
-        // services
-        $loader = new YamlFileLoader(
-            $container,
-            new FileLocator(__DIR__.'/../Resources/config')
-        );
-
-        $loader->load('services.yaml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.php');
 
         $issuer = $container->getDefinition(IdealRequest::class);
         $issuer->replaceArgument(1, $config);
