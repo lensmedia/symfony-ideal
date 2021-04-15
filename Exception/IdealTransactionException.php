@@ -7,8 +7,6 @@ use Lens\Bundle\IdealBundle\Response\AcquirerStatusRes;
 
 abstract class IdealTransactionException extends IdealException
 {
-    private $response;
-
     const TRANSACTION_OPEN = 0;
     const TRANSACTION_SUCCESS = 1;
     const TRANSACTION_CANCELLED = 2;
@@ -16,14 +14,12 @@ abstract class IdealTransactionException extends IdealException
     const TRANSACTION_FAILURE = 4;
 
     public function __construct(
-        AcquirerStatusRes $response,
+        private AcquirerStatusRes $response,
         string $message = null,
         int $code = 0,
         Exception $previous = null
     ) {
         parent::__construct($message, $code, $previous);
-
-        $this->response = $response;
     }
 
     public function getResponse(): AcquirerStatusRes

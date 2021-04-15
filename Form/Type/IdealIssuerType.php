@@ -9,21 +9,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IdealIssuerType extends AbstractType
 {
-    private $ideal;
-
-    public function __construct(Ideal $ideal)
+    public function __construct(private Ideal $ideal)
     {
-        $this->ideal = $ideal;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices' => array_flip($ideal->issuers()),
+            'choices' => array_flip($this->ideal->issuers()),
         ]);
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

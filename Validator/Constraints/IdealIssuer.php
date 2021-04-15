@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class IdealIssuer extends Constraint
 {
-    public $message = 'Invalid iDeal issuer value.';
+    public string $message = 'Invalid iDeal issuer selected.';
 }

@@ -9,11 +9,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class IdealIssuerValidator extends ConstraintValidator
 {
-    private $ideal;
-
-    public function __construct(Ideal $ideal)
+    public function __construct(private Ideal $ideal)
     {
-        $this->ideal = $ideal;
     }
 
     public function validate($value, Constraint $constraint)

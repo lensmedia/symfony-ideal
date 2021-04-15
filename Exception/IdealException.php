@@ -2,8 +2,8 @@
 
 namespace Lens\Bundle\IdealBundle\Exception;
 
-use Exception;
+use RuntimeException;
 
-class IdealException extends Exception
+class IdealException extends RuntimeException
 {
 }

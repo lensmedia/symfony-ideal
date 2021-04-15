@@ -7,24 +7,15 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    private $debug;
-    private $cacheDir;
-    private $projectDir;
-    private $appSecret;
-
     public function __construct(
-        bool $debug,
-        string $cacheDir,
-        string $projectDir,
-        string $appSecret
+        private bool $debug,
+        private string $cacheDir,
+        private string $projectDir,
+        private string $appSecret
     ) {
-        $this->debug = $debug;
-        $this->cacheDir = $cacheDir;
-        $this->projectDir = $projectDir;
-        $this->appSecret = $appSecret;
     }
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('lens_ideal');
 

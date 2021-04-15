@@ -13,10 +13,6 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final class Ideal
 {
-    private $cache;
-    private $directoryReq;
-    private $acquirerStatusRequest;
-
     const STATUS_CACHE_INDEX = 'lens_ideal_bundle.status';
     const STATUS_CACHE_TTL = 60 * 5; // 5 minutes (for new and open) as restricted by ideal.
 
@@ -24,19 +20,16 @@ final class Ideal
     const ISSUER_CACHE_TTL = 86400; // 60 * 60 * 24.
 
     public function __construct(
-        CacheInterface $cache,
-        AcquirerStatusReq $acquirerStatusRequest,
-        DirectoryReq $directoryReq
+        private CacheInterface $cache,
+        private AcquirerStatusReq $acquirerStatusRequest,
+        private DirectoryReq $directoryReq
     ) {
-        $this->cache = $cache;
-        $this->directoryReq = $directoryReq;
-        $this->acquirerStatusRequest = $acquirerStatusRequest;
     }
 
     /**
      * @return array Associative array with BIC (key) and brand name (value)
      */
-    public function issuers()
+    public function issuers(): array
     {
         return $this->cache->get(self::ISSUER_CACHE_INDEX, function (ItemInterface $item) {
             $item->expiresAfter(self::ISSUER_CACHE_TTL);
@@ -57,7 +50,7 @@ final class Ideal
      *
      * @return AcquirerStatusRes
      */
-    public function status(IdealRequestOptions $options)
+    public function status(IdealRequestOptions $options): AcquirerStatusRes
     {
         $transaction = $options->get('transaction');
         if (null === $transaction) {
@@ -70,7 +63,7 @@ final class Ideal
         }
 
         try {
-            return $this->cache->get(static::STATUS_CACHE_INDEX.'.'.$transaction, function (ItemInterface $item) use ($options) {
+            return $this->cache->get(self::STATUS_CACHE_INDEX.'.'.$transaction, function (ItemInterface $item) use ($options) {
                 $item->expiresAfter(self::STATUS_CACHE_TTL);
 
                 return $this->acquirerStatusRequest->execute($options);

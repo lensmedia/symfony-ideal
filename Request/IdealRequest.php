@@ -3,7 +3,7 @@
 namespace Lens\Bundle\IdealBundle\Request;
 
 use DOMDocument;
-use Exception;
+use Lens\Bundle\IdealBundle\Exception\IdealException;
 use Lens\Bundle\IdealBundle\Response\IdealResponse;
 use RobRichards\XMLSecLibs\XMLSecEnc;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
@@ -13,20 +13,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class IdealRequest implements IdealRequestInterface
 {
-    const STATE_STATUS = 0;
-    const STATE_HEADERS = 1;
-    const STATE_CONTENT = 2;
-
-    const CRLF = "\r\n";
-
-    protected $options;
-    private $document;
-    private $http;
-
-    public function __construct(HttpClientInterface $http, array $options)
-    {
-        $this->http = $http;
-        $this->options = $options;
+    public function __construct(
+        private HttpClientInterface $http,
+        protected array $options
+    ) {
     }
 
     abstract public function message(IdealRequestOptions $options): DOMDocument;
@@ -56,7 +46,7 @@ abstract class IdealRequest implements IdealRequestInterface
         // Verify response.
         $document = new DOMDocument();
         if (!$document->loadXML($response->getContent()) || !$this->verify($document)) {
-            throw new Exception('Response validation failed');
+            throw new IdealException('Response validation failed');
         }
 
         return IdealResponse::create(
@@ -112,7 +102,7 @@ abstract class IdealRequest implements IdealRequestInterface
             return new File($path.$certificate);
         }
 
-        throw new Exception('Unknown acquirer configured.');
+        throw new IdealException('Unknown acquirer configured.');
     }
 
     private function acquirerUrl(): string
@@ -140,7 +130,7 @@ abstract class IdealRequest implements IdealRequestInterface
             return $url;
         }
 
-        throw new Exception('Unknown acquirer configured.');
+        throw new IdealException('Unknown acquirer configured.');
     }
 
     private function sign(DOMDocument $document): DOMDocument

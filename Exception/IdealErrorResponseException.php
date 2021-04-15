@@ -6,13 +6,14 @@ use Lens\Bundle\IdealBundle\Response\AcquirerErrorRes;
 
 class IdealErrorResponseException extends IdealException
 {
-    private $error;
-
-    public function __construct(AcquirerErrorRes $error)
+    public function __construct(private AcquirerErrorRes $error)
     {
-        parent::__construct('['.$error->errorCode().'] '.$error->errorMessage().' - '.$error->errorDetail(), 0);
-
-        $this->error = $error;
+        parent::__construct(sprintf(
+            '[%s] %s - %s',
+            $error->errorCode(),
+            $error->errorMessage(),
+            $error->errorDetail(),
+        ));
     }
 
     public function getError(): AcquirerErrorRes
@@ -35,7 +36,7 @@ class IdealErrorResponseException extends IdealException
         return $this->error->consumerMessage();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->error->consumerMessage();
     }

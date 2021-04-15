@@ -1,10 +1,11 @@
 {
     "name": "lens/ideal",
     "description": "Bundle for handeling iDeal transactions",
+    "version": "0.0.1",
     "type": "symfony-bundle",
     "license": "proprietary",
     "require": {
-        "php": ">=7.1",
+        "php": ">=8",
         "ext-dom": "*",
         "ext-simplexml": "*",
         "robrichards/xmlseclibs": "*",
@@ -12,7 +13,8 @@
         "symfony/framework-bundle": "^5",
         "symfony/http-client": "^5",
         "symfony/yaml": "^5",
-        "symfony/form": "^5.2"
+        "symfony/form": "^5",
+        "symfony/validator": "^5"
     },
     "autoload": {
         "psr-4": {

@@ -10,15 +10,11 @@ use SimpleXMLElement;
 
 abstract class IdealResponse implements IdealResponseInterface, Serializable
 {
-    protected $status;
-    protected $info;
-    protected $content;
-
-    protected function __construct(int $status, array $info, SimpleXMLElement $content)
-    {
-        $this->status = $status;
-        $this->info = $info;
-        $this->content = $content;
+    protected function __construct(
+        protected int $status,
+        protected array $info,
+        protected ?SimpleXMLElement $content = null
+    ) {
     }
 
     public function serialize(): string
@@ -36,7 +32,9 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
 
         $this->status = $data['status'];
         $this->info = $data['info'];
-        $this->content = $data['content'] ? simplexml_load_string($data['content']) : null;
+        $this->content = $data['content']
+            ? simplexml_load_string($data['content'])
+            : null;
     }
 
     public static function create(int $status, array $info, string $content)
