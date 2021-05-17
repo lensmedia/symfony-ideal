@@ -13,10 +13,10 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final class Ideal
 {
-    const STATUS_CACHE_INDEX = 'lens_ideal_bundle.status';
-    const STATUS_CACHE_TTL = 60 * 5; // 5 minutes (for new and open) as restricted by ideal.
+    const STATUS_CACHE_INDEX = 'lib-s';
+    const STATUS_CACHE_TTL = 60 * 4; // 5 minutes (for new and open) as restricted by ideal.
 
-    const ISSUER_CACHE_INDEX = 'lens_ideal_bundle.issuer';
+    const ISSUER_CACHE_INDEX = 'lib-i';
     const ISSUER_CACHE_TTL = 86400; // 60 * 60 * 24.
 
     public function __construct(
@@ -63,7 +63,7 @@ final class Ideal
         }
 
         try {
-            return $this->cache->get(self::STATUS_CACHE_INDEX.'.'.$transaction, function (ItemInterface $item) use ($options) {
+            return $this->cache->get(self::STATUS_CACHE_INDEX.'-'.$transaction, function (ItemInterface $item) use ($options) {
                 $item->expiresAfter(self::STATUS_CACHE_TTL);
 
                 return $this->acquirerStatusRequest->execute($options);
