@@ -1,7 +1,7 @@
 {
     "name": "lensmedia/symfony-ideal",
     "description": "Bundle for handeling iDeal transactions",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "type": "symfony-bundle",
     "license": "proprietary",
     "require": {

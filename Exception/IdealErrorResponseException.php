@@ -28,7 +28,12 @@ class IdealErrorResponseException extends IdealException
 
     public function getErrorDescription(): string
     {
-        return AcquirerErrorRes::ERROR_DESCRIPTIONS[$this->error->errorCode()];
+        $code = $this->error->errorCode();
+        if (isset(AcquirerErrorRes::ERROR_DESCRIPTIONS[$code])) {
+            return AcquirerErrorRes::ERROR_DESCRIPTIONS[$code];
+        }
+
+        return $this->error->errorMessage();
     }
 
     public function getConsumerMessage(): string
