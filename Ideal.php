@@ -46,7 +46,7 @@ final class Ideal
      *
      * @param IdealRequestOptions $options instance of options (requires filled index transaction)
      *
-     * @throws IdealException when transaction id is missing
+     * @throws IdealException when transaction id is missing or invalid.
      *
      * @return AcquirerStatusRes
      */

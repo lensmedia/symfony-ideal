@@ -21,8 +21,9 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
     {
         return serialize([
             'status' => $this->status,
-            'info' => $this->info,
-            'content' => $this->content ? $this->content->asXML() : null,
+            'content' => $this->content
+                ? $this->content->asXML()
+                : null,
         ]);
     }
 
@@ -31,7 +32,6 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
         $data = unserialize($serialized);
 
         $this->status = $data['status'];
-        $this->info = $data['info'];
         $this->content = $data['content']
             ? simplexml_load_string($data['content'])
             : null;
