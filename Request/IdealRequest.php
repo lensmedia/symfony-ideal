@@ -21,7 +21,7 @@ abstract class IdealRequest implements IdealRequestInterface
 
     abstract public function message(IdealRequestOptions $options): DOMDocument;
 
-    public function execute(IdealRequestOptions $options = null): IdealResponse
+    public function execute(?IdealRequestOptions $options = null): IdealResponse
     {
         $url = $this->acquirerUrl();
 
@@ -30,8 +30,11 @@ abstract class IdealRequest implements IdealRequestInterface
             $options = new IdealRequestOptions();
         }
 
-        $options->set('merchant_id', $this->options['merchant_id']);
-        $options->set('sub_id', $this->options['sub_id']);
+        $options->default('merchant_id', $this->options['merchant_id']);
+        $options->default('sub_id', $this->options['sub_id']);
+        $options->default('language', $this->options['language']);
+        $options->default('expiration_period', $this->options['expiration_period']);
+        $options->default('currency', $this->options['currency']);
 
         // Generate request using said options.
         $request = $this->message($options);

@@ -25,15 +25,15 @@ final class AcquirerTrxReq extends IdealRequest
                 <Transaction>
                     <purchaseID>'.$options->get('id').'</purchaseID>
                     <amount>'.$options->get('amount').'</amount>
-                    <currency>EUR</currency>
-                    <expirationPeriod>PT1H</expirationPeriod>
-                    <language>nl</language>
+                    <currency>'.strtoupper($options->get('currency')).'</currency>
+                    <expirationPeriod>'.strtoupper($options->get('expiration_period')).'</expirationPeriod>
+                    <language>'.$options->get('locale').'</language>
                     <description>'.$options->get('description').'</description>
                     <entranceCode>'.$entrance.'</entranceCode>
                 </Transaction>
             </AcquirerTrxReq>
         ');
-
         return $document;
+
     }
 }

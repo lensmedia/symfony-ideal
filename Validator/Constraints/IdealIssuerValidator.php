@@ -9,11 +9,12 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class IdealIssuerValidator extends ConstraintValidator
 {
-    public function __construct(private Ideal $ideal)
-    {
+    public function __construct(
+        private Ideal $ideal,
+    ) {
     }
 
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof IdealIssuer) {
             throw new UnexpectedTypeException($constraint, IdealIssuer::class);

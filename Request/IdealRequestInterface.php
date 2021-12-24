@@ -9,20 +9,16 @@ interface IdealRequestInterface
 {
     /**
      * Executes a specific request using our options.
-     *
-     * @param IdealRequestOptions|null $options
-     *
-     * @return
      */
-    public function execute(IdealRequestOptions $options = null): IdealResponse;
+    public function execute(?IdealRequestOptions $options = null): IdealResponse;
 
     /**
-     * Internally used function used to retreive the DOMDocument using our specific
+     * Internally used function used to retrieve the DOMDocument using our specific
      * request options when supplied in our execute function.
      *
-     * @param IdealRequestOptions|null $options
+     * @param IdealRequestOptions $options
      *
-     * @return IdealResponseInterface instance for the specific request
+     * @return DOMDocument instance for the specific request
      */
     public function message(IdealRequestOptions $options): DOMDocument;
 }

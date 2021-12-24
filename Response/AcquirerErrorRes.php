@@ -6,7 +6,7 @@ use SimpleXMLElement;
 
 final class AcquirerErrorRes extends IdealResponse
 {
-    const ERROR_CATEGORIES = [
+    public const ERROR_CATEGORIES = [
         'IX' => 'Invalid XML and all related problems. Such as incorrect encoding, invalid version, otherwise unreadable.',
         'SO' => 'System maintenance. The errors that are communicated in the event of system maintenance or system failure. Also covers the situation where new requests are no longer being accepted but requests already submitted will be dealt with (until a certain time).',
         'SE' => 'Security and authentication errors. Incorrect authentication methods and expired certificates.',
@@ -14,7 +14,7 @@ final class AcquirerErrorRes extends IdealResponse
         'AP' => 'Application errors. Errors relating to IDs, account numbers, time zones, transactions, currencies.',
     ];
 
-    const ERROR_DESCRIPTIONS = [
+    public const ERROR_DESCRIPTIONS = [
         'IX1000' => 'Received XML not well-formed.',
         'IX1100' => 'Received XML not valid',
         'IX1200' => 'Encoding type not UTF-8',

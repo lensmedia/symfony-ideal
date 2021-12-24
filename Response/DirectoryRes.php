@@ -9,7 +9,7 @@ final class DirectoryRes extends IdealResponse
         $issuers = [];
 
         foreach ($this->content->Directory->children() as $item) {
-            if ('Country' != $item->getName()) {
+            if ('Country' !== $item->getName()) {
                 continue;
             }
 

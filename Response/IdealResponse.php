@@ -5,6 +5,7 @@ namespace Lens\Bundle\IdealBundle\Response;
 use DateTimeImmutable;
 use Exception;
 use Lens\Bundle\IdealBundle\Exception\IdealErrorResponseException;
+use RuntimeException;
 use Serializable;
 use SimpleXMLElement;
 
@@ -21,15 +22,15 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
     {
         return serialize([
             'status' => $this->status,
-            'content' => $this->content
-                ? $this->content->asXML()
-                : null,
+            'content' => $this->content?->asXML(),
         ]);
     }
 
     public function unserialize($serialized): void
     {
-        $data = unserialize($serialized);
+        $data = unserialize($serialized, [
+            'allowed_classes' => [ self::class ],
+        ]);
 
         $this->status = $data['status'];
         $this->content = $data['content']
@@ -40,12 +41,12 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
     public static function create(int $status, array $info, string $content)
     {
         if (false === ($content = @simplexml_load_string($content))) {
-            throw new Exception('Response does not seem to contain valid XML.');
+            throw new RuntimeException('Response does not seem to contain valid XML.');
         }
 
         $class = '\\'.__NAMESPACE__.'\\'.$content->getName();
         if (!class_exists($class) || !is_a($class, IdealResponseInterface::class, true)) {
-            throw new Exception(sprintf(
+            throw new RuntimeException(sprintf(
                 "Unsupported response detected '%s', aborting.",
                 $class
             ));
@@ -77,7 +78,7 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
 
         $exception = '\\'.implode('\\', $namespace).'\\Exception\\IdealTransaction'.ucfirst($response->status()).'Exception';
         if (!class_exists($exception)) {
-            throw new Exception(sprintf(
+            throw new RuntimeException(sprintf(
                 "Unsupported status detected '%s', aborting.",
                 $response->status()
             ));

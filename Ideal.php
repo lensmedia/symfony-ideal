@@ -8,21 +8,22 @@ use Lens\Bundle\IdealBundle\Request\AcquirerStatusReq;
 use Lens\Bundle\IdealBundle\Request\DirectoryReq;
 use Lens\Bundle\IdealBundle\Request\IdealRequestOptions;
 use Lens\Bundle\IdealBundle\Response\AcquirerStatusRes;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final class Ideal
 {
-    const STATUS_CACHE_INDEX = 'lib-s';
-    const STATUS_CACHE_TTL = 60 * 4; // 5 minutes (for new and open) as restricted by ideal.
+    private const STATUS_CACHE_INDEX = 'lib-s';
+    private const STATUS_CACHE_TTL = 60 * 4; // 5 minutes (for new and open) as restricted by ideal.
 
-    const ISSUER_CACHE_INDEX = 'lib-i';
-    const ISSUER_CACHE_TTL = 86400; // 60 * 60 * 24.
+    private const ISSUER_CACHE_INDEX = 'lib-i';
+    private const ISSUER_CACHE_TTL = 86400; // 60 * 60 * 24.
 
     public function __construct(
         private CacheInterface $cache,
         private AcquirerStatusReq $acquirerStatusRequest,
-        private DirectoryReq $directoryReq
+        private DirectoryReq $directoryReq,
     ) {
     }
 
