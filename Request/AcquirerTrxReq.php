@@ -9,7 +9,6 @@ final class AcquirerTrxReq extends IdealRequest
     public function message(IdealRequestOptions $options): DOMDocument
     {
         $document = new DOMDocument();
-        $entrance = sha1(uniqid(true));
 
         $document->loadXML('
             <AcquirerTrxReq xmlns="http://www.idealdesk.com/ideal/messages/mer-acq/3.3.1" version="3.3.1">
@@ -29,11 +28,11 @@ final class AcquirerTrxReq extends IdealRequest
                     <expirationPeriod>'.strtoupper($options->get('expiration_period')).'</expirationPeriod>
                     <language>'.$options->get('language').'</language>
                     <description>'.$options->get('description').'</description>
-                    <entranceCode>'.$entrance.'</entranceCode>
+                    <entranceCode>'.$options->get('entrance_code', sha1(uniqid(true, true))).'</entranceCode>
                 </Transaction>
             </AcquirerTrxReq>
         ');
-        return $document;
 
+        return $document;
     }
 }
