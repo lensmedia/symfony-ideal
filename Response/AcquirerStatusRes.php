@@ -25,4 +25,28 @@ class AcquirerStatusRes extends IdealResponse
     {
         return new DateTimeImmutable($this->content->Transaction->statusDateTimestamp);
     }
+
+    public function consumerName(): string
+    {
+        return (string)$this->content->Transaction->consumerName;
+    }
+    public function consumerIban(): string
+    {
+        return (string)$this->content->Transaction->consumerIBAN;
+    }
+
+    public function consumerBic(): string
+    {
+        return (string)$this->content->Transaction->consumerBIC;
+    }
+
+    public function amount(): string
+    {
+        return (string)$this->content->Transaction->amount;
+    }
+
+    public function currency(): string
+    {
+        return (string)$this->content->Transaction->currency;
+    }
 }
