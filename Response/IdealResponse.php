@@ -3,6 +3,7 @@
 namespace Lens\Bundle\IdealBundle\Response;
 
 use DateTimeImmutable;
+use DOMDocument;
 use Exception;
 use Lens\Bundle\IdealBundle\Exception\IdealErrorResponseException;
 use RuntimeException;
@@ -105,5 +106,19 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
     public function keyName(): string
     {
         return (string) $this->content->Signature->KeyInfo->KeyName;
+    }
+
+    public function responseContent(): string
+    {
+        if (!$this->content) {
+            return '';
+        }
+
+        $dom = new DOMDocument("1.0");
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($this->content->asXML());
+
+        return $dom->saveXML();
     }
 }

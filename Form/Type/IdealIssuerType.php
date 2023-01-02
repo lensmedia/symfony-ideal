@@ -3,7 +3,6 @@
 namespace Lens\Bundle\IdealBundle\Form\Type;
 
 use Lens\Bundle\IdealBundle\Ideal;
-use Lens\Bundle\IdealBundle\Validator\Constraints\IdealIssuer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
