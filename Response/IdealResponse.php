@@ -10,7 +10,7 @@ use RuntimeException;
 use Serializable;
 use SimpleXMLElement;
 
-abstract class IdealResponse implements IdealResponseInterface, Serializable
+abstract class IdealResponse implements IdealResponseInterface
 {
     protected function __construct(
         protected int $status,
@@ -19,20 +19,16 @@ abstract class IdealResponse implements IdealResponseInterface, Serializable
     ) {
     }
 
-    public function serialize(): string
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             'status' => $this->status,
             'content' => $this->content?->asXML(),
-        ]);
+        ];
     }
 
-    public function unserialize($serialized): void
+    public function __unserialize(array $data): void
     {
-        $data = unserialize($serialized, [
-            'allowed_classes' => [ self::class ],
-        ]);
-
         $this->status = $data['status'];
         $this->content = $data['content']
             ? simplexml_load_string($data['content'])
