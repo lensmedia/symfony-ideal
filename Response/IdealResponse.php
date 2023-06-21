@@ -7,7 +7,6 @@ use DOMDocument;
 use Exception;
 use Lens\Bundle\IdealBundle\Exception\IdealErrorResponseException;
 use RuntimeException;
-use Serializable;
 use SimpleXMLElement;
 
 abstract class IdealResponse implements IdealResponseInterface
