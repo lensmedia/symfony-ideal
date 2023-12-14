@@ -8,7 +8,8 @@
         "php": ">=8.2",
         "ext-openssl": "*",
         "symfony/framework-bundle": "^6.0|^7.0",
-        "symfony/monolog-bundle": "^3.10"
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/http-client": "^6.0|^7.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.40"
