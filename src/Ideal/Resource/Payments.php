@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
+use DateTimeImmutable;
 use Lens\Bundle\IdealBundle\Ideal\Exception\NotImplemented;
+use Lens\Bundle\IdealBundle\Ideal\Data\Payment;
+use Symfony\Component\Uid\Uuid;
 
 readonly class Payments extends Resource
 {
+    use PaymentTrait;
+
     private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3';
 
     /**
      * Use this operation to initiate a payment on behalf of the Payment Service User. Strong customer authentication
      * might be required by the ASPSP, the response will indicate which step is required to complete the payment.
      */
-    public function create(): void
+    public function create(Payment $payment): void
     {
+        $headers = [
+            'X-Request-ID' => (string)Uuid::v4(),
+            'MessageCreateDateTime' => (new DateTimeImmutable())->format('c'),
+        ];
+
         // POST /payments
 
         throw new NotImplemented(__METHOD__);

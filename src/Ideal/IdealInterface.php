@@ -23,5 +23,17 @@ use Lens\Bundle\IdealBundle\Ideal\Resource\ScheduledPayments;
  */
 interface IdealInterface
 {
+    public const STATUS_COMPLETED = 'SettlementCompleted';
+    public const STATUS_CANCELLED = 'Cancelled';
+    public const STATUS_EXPIRED = 'Expired';
+    public const STATUS_OPEN = 'Open';
+    public const STATUS_ERROR = 'Error';
+
+    public const CHECKOUT_PRICE_COMPLETED = 100;
+    public const CHECKOUT_PRICE_CANCELLED = 200;
+    public const CHECKOUT_PRICE_EXPIRED = 300;
+    public const CHECKOUT_PRICE_OPEN = 400;
+    public const CHECKOUT_PRICE_ERROR = 500;
+
     public function config(): Configuration;
 }

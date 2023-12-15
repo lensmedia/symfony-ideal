@@ -38,4 +38,9 @@ readonly abstract class Resource
 
         return 'Signature '.implode(', ', $parts);
     }
+
+    protected function isSuccessfulHttpStatus(int $status): bool
+    {
+        return $status >= 200 && $status < 300;
+    }
 }

@@ -9,7 +9,10 @@
         "ext-openssl": "*",
         "symfony/framework-bundle": "^6.0|^7.0",
         "symfony/monolog-bundle": "^3.10",
-        "symfony/http-client": "^6.0|^7.0"
+        "symfony/http-client": "^6.0|^7.0",
+        "symfony/uid": "^6.0|^7.0",
+        "symfony/validator": "^6.0|^7.0",
+        "brick/money": "^0.9.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.40"

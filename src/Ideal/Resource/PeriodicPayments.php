@@ -8,6 +8,8 @@ use Lens\Bundle\IdealBundle\Ideal\Exception\NotImplemented;
 
 readonly class PeriodicPayments extends Resource
 {
+    use PaymentTrait;
+
     private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3';
 
     /**

@@ -11,6 +11,8 @@ use Lens\Bundle\IdealBundle\Ideal\Resource\PeriodicPayments;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Preferences;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Refunds;
 use Lens\Bundle\IdealBundle\Ideal\Resource\ScheduledPayments;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -32,6 +34,8 @@ readonly final class Ideal implements IdealInterface
 
     public function __construct(
         private Configuration $config,
+        public ?CacheItemPoolInterface $cache = null,
+        public ?LoggerInterface $logger = null,
     ) {
         $this->httpClient = HttpClient::createForBaseUri($this->config->baseUrl);
 
