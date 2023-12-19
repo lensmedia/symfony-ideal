@@ -6,13 +6,13 @@ namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
 use Brick\Math\BigDecimal;
 use Brick\Money\Currency;
-use Lens\Bundle\IdealBundle\Ideal\Util;
-use Symfony\Component\Validator\Constraints as Assert;
+use DateTimeImmutable;
+use Lens\Bundle\IdealBundle\Ideal\Data\Type\RateType;
 
 /**
  * Provides details on the currency exchange rate and contract.
  */
-class ExchangeRateInformationRequest implements SerializableRequestData
+class ExchangeRateInformationResponse
 {
     /**
      * Currency in which the rate of exchange is expressed in a currency exchange. In the example 1GBP = xxxCUR, the
@@ -29,21 +29,16 @@ class ExchangeRateInformationRequest implements SerializableRequestData
     /**
      * Specifies the type used to complete the currency exchange.
      */
-    public ?string $rateType = null;
+    public ?RateType $rateType = null;
 
     /**
-     * Unique and unambiguous reference to the foreign exchange contract agreed between the initiating party/creditor and the debtor agent.
+     * Unique and unambiguous reference to the foreign exchange contract agreed between the initiating party/creditor
+     * and the debtor agent.
      */
-    #[Assert\Length(max: 256)]
     public ?string $contractIdentification = null;
 
-    public function jsonSerialize(): array
-    {
-        return array_filter([
-            'UnitCurrency' => Util::currencyToString($this->unitCurrency),
-            'ExchangeRate' => $this->exchangeRate?->toFloat(),
-            'RateType' => $this->rateType,
-            'ContractIdentification' => $this->contractIdentification,
-        ], Util::isNotNull(...));
-    }
+    /**
+     * Expiration date time. ISO 8601 DateTime.
+     */
+    public ?DateTimeImmutable $expirationDateTime = null;
 }

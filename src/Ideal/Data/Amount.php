@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
+use Brick\Math\BigDecimal;
 use Brick\Money\Currency;
 use Brick\Money\Money;
 use Lens\Bundle\IdealBundle\Ideal\Data\Type\AmountType;
+use Lens\Bundle\IdealBundle\Ideal\Exception\CurrencyMismatch;
+use Lens\Bundle\IdealBundle\Ideal\Exception\InvalidArgument;
 use Lens\Bundle\IdealBundle\Ideal\Util;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -29,7 +32,7 @@ class Amount implements SerializableRequestData
      * @example 123.45
      */
     #[Assert\NotBlank]
-    public Money $amount;
+    public BigDecimal $amount;
 
     /**
      * Conditionally used for amount type Change or Define. The value in case of Change should be less than or equal to
@@ -39,7 +42,7 @@ class Amount implements SerializableRequestData
      *
      * @example 123.45
      */
-    public ?Money $minimumAmount = null;
+    public ?BigDecimal $minimumAmount = null;
 
     /**
      * Conditionally used for amount type Change or Define. The value in case of Change should be greater than or equal
@@ -49,7 +52,7 @@ class Amount implements SerializableRequestData
      *
      * @example 123.45
      */
-    public ?Money $maximumAmount = null;
+    public ?BigDecimal $maximumAmount = null;
 
     /**
      * Currency of the payment. ISO 4217 currency codes should be used. For iDEAL only EUR is possible.
@@ -68,15 +71,63 @@ class Amount implements SerializableRequestData
      */
     public ?AmountBreakdown $amountBreakdown = null;
 
+    public static function create(
+        Money|BigDecimal|string $amount,
+        ?AmountType $type = null,
+        ?BigDecimal $minimumAmount = null,
+        ?BigDecimal $maximumAmount = null,
+        Currency|string|null $currency = null,
+    ): self {
+        if (!($amount instanceof Money) && $currency === null) {
+            throw new InvalidArgument('Currency must be provided when amount is not a Money object');
+        }
+
+        if ($currency && $amount instanceof Money && $currency !== (string)$amount->getCurrency()) {
+            throw new CurrencyMismatch((string)$currency, (string)$amount->getCurrency());
+        }
+
+        $instance = new self();
+        $instance->setAmount($amount);
+
+        $instance->type = $type;
+        $instance->minimumAmount = $minimumAmount;
+        $instance->maximumAmount = $maximumAmount;
+
+        if ($currency) {
+            $instance->setCurrency($currency);
+        }
+
+        return $instance;
+    }
+
+    public function setAmount(Money|BigDecimal|string $amount): void
+    {
+        if ($amount instanceof Money) {
+            $this->amount = $amount->getAmount();
+            $this->currency = $amount->getCurrency();
+        } elseif (is_string($amount)) {
+            $this->amount = BigDecimal::of($amount);
+        } else {
+            $this->amount = $amount;
+        }
+    }
+
+    public function setCurrency(Currency|string|null $currency): void
+    {
+        $this->currency = is_string($currency)
+            ? Currency::of($currency)
+            : $currency;
+    }
+
     public function jsonSerialize(): array
     {
         return array_filter([
-            'Type' => Util::EnumToString($this->type),
-            'Amount' => Util::MoneyToString($this->amount),
-            'MinimumAmount' => Util::MoneyToString($this->minimumAmount),
-            'MaximumAmount' => Util::MoneyToString($this->maximumAmount),
-            'Currency' => Util::CurrencyToString($this->currency),
+            'Type' => Util::enumToString($this->type),
+            'Amount' => Util::moneyToString($this->amount),
+            'MinimumAmount' => Util::moneyToString($this->minimumAmount),
+            'MaximumAmount' => Util::moneyToString($this->maximumAmount),
+            'Currency' => Util::currencyToString($this->currency),
             'AmountBreakdown' => $this->amountBreakdown,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

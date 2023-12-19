@@ -56,13 +56,13 @@ class RiskInformation implements SerializableRequestData
     public function jsonSerialize(): array
     {
         return array_filter([
-            'PaymentContextCode' => Util::EnumToString($this->paymentContextCode),
+            'PaymentContextCode' => Util::enumToString($this->paymentContextCode),
             'MerchantCategoryCode' => $this->merchantCategoryCode,
             'MerchantCustomerId' => $this->merchantCustomerId,
-            'ChannelType' => Util::EnumToString($this->channelType),
+            'ChannelType' => Util::enumToString($this->channelType),
             'ChannelMetaData' => $this->channelMetaData,
-            'AppliedAuthenticationApproach' => Util::EnumToString($this->appliedAuthenticationApproach),
+            'AppliedAuthenticationApproach' => Util::enumToString($this->appliedAuthenticationApproach),
             'ReferencePaymentOrderId' => $this->referencePaymentOrderId,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

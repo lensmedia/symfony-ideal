@@ -37,9 +37,9 @@ class CreditorAccount implements SerializableRequestData
     {
         return array_filter([
             'SecondaryIdentification' => $this->secondaryIdentification,
-            'SchemeName' => Util::EnumToString($this->schemeName),
+            'SchemeName' => Util::enumToString($this->schemeName),
             'Identification' => $this->identification,
-            'Currency' => Util::CurrencyToString($this->currency),
-        ], 'is_null');
+            'Currency' => Util::currencyToString($this->currency),
+        ], Util::isNotNull(...));
     }
 }

@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
+use Lens\Bundle\IdealBundle\Ideal\Util;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * I have no idea, is it just https://qrmodul.ch/en/information-on-qr-bill ?
+ */
 class RemittanceInformationStructured implements SerializableRequestData
 {
     /**
@@ -33,6 +37,6 @@ class RemittanceInformationStructured implements SerializableRequestData
             'Reference' => $this->reference,
             'ReferenceType' => $this->referenceType,
             'ReferenceIssuer' => $this->referenceIssuer,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

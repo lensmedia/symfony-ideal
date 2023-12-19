@@ -8,6 +8,8 @@ use Lens\Bundle\IdealBundle\Ideal\Configuration;
 use Lens\Bundle\IdealBundle\Ideal\Ideal;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Used to create an instance of the iDEAL client using values defined in the symfony configuration files.
@@ -20,8 +22,7 @@ final readonly class IdealFactory
 {
     public function __construct(
         private array $config,
-        private CacheItemPoolInterface $cache,
-        private LoggerInterface $logger,
+        private SerializerInterface $denormalizer,
     ) {
     }
 
@@ -38,6 +39,6 @@ final readonly class IdealFactory
             subId: $this->config['sub_id'],
         );
 
-        return new Ideal($config, $this->cache, $this->logger);
+        return new Ideal($config, $this->denormalizer);
     }
 }

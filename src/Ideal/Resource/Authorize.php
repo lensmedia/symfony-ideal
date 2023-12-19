@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
-use Exception;
 use Lens\Bundle\IdealBundle\Ideal\Data\AccessToken;
 use Lens\Bundle\IdealBundle\Ideal\Ideal;
 
@@ -15,12 +14,15 @@ readonly class Authorize extends Resource
     /**
      * Generates a token for the Initiating Party.
      */
-    public function token(): AccessToken
+    public function token(bool $debugToken = false): AccessToken
     {
+        if ($debugToken) {
+            return new AccessToken('97fb13a74c712d8c7a50476e71769eaf', 'Bearer');
+        }
+
         $headers = $this->headers();
 
-        // POST /token
-        $request = $this->ideal->post(self::BASE_URL.'/token', [
+        $response = $this->ideal->post(self::BASE_URL.'/token', [
             'headers' => $headers + [
                 'Authorization' => $this->signature($headers),
             ],
@@ -29,13 +31,13 @@ readonly class Authorize extends Resource
             ],
         ]);
 
-        return AccessToken::fromResponse($request);
+        return $this->denormalize($response, AccessToken::class);
     }
 
     /**
      * Revokes a token for the Initiating Party.
      */
-    public function revoke(AccessToken|string $accessToken): bool
+    public function revoke(AccessToken|string $accessToken): void
     {
         if ($accessToken instanceof AccessToken) {
             $accessToken = $accessToken->accessToken;
@@ -43,23 +45,14 @@ readonly class Authorize extends Resource
 
         $headers = $this->headers();
 
-        // POST /revoke
-        $request = $this->ideal->post(self::BASE_URL.'/revoke', [
+        $this->ideal->post(self::BASE_URL.'/revoke', [
             'headers' => $headers + [
-                'Authorization' => $this->signature($headers),
-            ],
+                    'Authorization' => $this->signature($headers),
+                ],
             'body' => [
                 'token' => $accessToken,
             ],
         ]);
-
-        try {
-            return $this->isSuccessfulHttpStatus($request->getStatusCode());
-        } catch (Exception $exception) {
-            $this->ideal->logger?->error($exception->getMessage());
-
-            return false;
-        }
     }
 
     private function headers(): array

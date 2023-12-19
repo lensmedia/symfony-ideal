@@ -45,8 +45,8 @@ class AmountBreakdown implements SerializableRequestData
     public function jsonSerialize(): array
     {
         return [
-            'OrderAmount' => Util::MoneyToString($this->orderAmount),
-            'ShippingCost' => Util::MoneyToString($this->shippingCost),
+            'OrderAmount' => Util::moneyToString($this->orderAmount),
+            'ShippingCost' => Util::moneyToString($this->shippingCost),
         ];
     }
 }

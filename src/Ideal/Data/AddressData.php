@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
+use Lens\Bundle\IdealBundle\Ideal\Util;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class AddressData implements SerializableRequestData
@@ -95,6 +96,6 @@ class AddressData implements SerializableRequestData
             'TownName' => $this->townName,
             'Country' => $this->country,
             'CountrySubDivision' => $this->countrySubDivision,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

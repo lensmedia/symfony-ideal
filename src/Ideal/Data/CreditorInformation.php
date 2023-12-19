@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
+use Lens\Bundle\IdealBundle\Ideal\Util;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -54,6 +55,6 @@ class CreditorInformation implements SerializableRequestData
             'UltimateCreditor' => $this->ultimateCreditor,
             'PostalAddress' => $this->postalAddress,
             'CreditorDateAndPlaceOfBirth' => $this->creditorDateAndPlaceOfBirth,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

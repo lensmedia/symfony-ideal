@@ -11,12 +11,10 @@ use Lens\Bundle\IdealBundle\Ideal\Resource\PeriodicPayments;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Preferences;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Refunds;
 use Lens\Bundle\IdealBundle\Ideal\Resource\ScheduledPayments;
-use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 readonly final class Ideal implements IdealInterface
 {
@@ -34,8 +32,7 @@ readonly final class Ideal implements IdealInterface
 
     public function __construct(
         private Configuration $config,
-        public ?CacheItemPoolInterface $cache = null,
-        public ?LoggerInterface $logger = null,
+        private DenormalizerInterface $denormalizer,
     ) {
         $this->httpClient = HttpClient::createForBaseUri($this->config->baseUrl);
 
@@ -54,28 +51,33 @@ readonly final class Ideal implements IdealInterface
         return $this->config;
     }
 
-    public function get(string $url, array $options = []): ResponseInterface
+    public function denormalize(array $data, string $class, array $context = []): object
+    {
+        return $this->denormalizer->denormalize($data, $class, null, $context);
+    }
+
+    public function get(string $url, array $options = []): array
     {
         return $this->request(Request::METHOD_GET, $url, $options);
     }
 
-    public function post(string $url, array $options = []): ResponseInterface
+    public function post(string $url, array $options = []): array
     {
         return $this->request(Request::METHOD_POST, $url, $options);
     }
 
-    public function put(string $url, array $options = []): ResponseInterface
+    public function put(string $url, array $options = []): array
     {
         return $this->request(Request::METHOD_PUT, $url, $options);
     }
 
-    public function delete(string $url, array $options = []): ResponseInterface
+    public function delete(string $url, array $options = []): array
     {
         return $this->request(Request::METHOD_DELETE, $url, $options);
     }
 
-    private function request(string $method, string $url, array $options = []): ResponseInterface
+    private function request(string $method, string $url, array $options = []): array
     {
-        return $this->httpClient->request($method, $url, $options);
+        return $this->httpClient->request($method, $url, $options)->toArray();
     }
 }

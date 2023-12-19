@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
+use Lens\Bundle\IdealBundle\Ideal\Util;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -44,6 +45,6 @@ class DebtorInformation implements SerializableRequestData
             'UltimateDebtor' => $this->ultimateDebtor,
             'ShippingAddress' => $this->shippingAddress,
             'BillingAddress' => $this->billingAddress,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

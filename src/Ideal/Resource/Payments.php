@@ -5,37 +5,71 @@ declare(strict_types=1);
 namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
 use DateTimeImmutable;
+use DateTimeInterface;
+use JetBrains\PhpStorm\ArrayShape;
+use Lens\Bundle\IdealBundle\Ideal\Data\PaymentInitiationRequest;
+use Lens\Bundle\IdealBundle\Ideal\Data\PaymentInitiationResponse;
 use Lens\Bundle\IdealBundle\Ideal\Exception\NotImplemented;
-use Lens\Bundle\IdealBundle\Ideal\Data\Payment;
 use Symfony\Component\Uid\Uuid;
 
 readonly class Payments extends Resource
 {
     use PaymentTrait;
 
-    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3';
+    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3/payments';
 
     /**
      * Use this operation to initiate a payment on behalf of the Payment Service User. Strong customer authentication
      * might be required by the ASPSP, the response will indicate which step is required to complete the payment.
      */
-    public function create(Payment $payment): void
-    {
-        $headers = [
+    public function create(
+        PaymentInitiationRequest $payment,
+
+        #[ArrayShape(PaymentArrayShapeInterface::PAYMENT_QUERY_PARAMS)]
+        array $query = [],
+
+        #[ArrayShape(PaymentArrayShapeInterface::PAYMENT_HEADERS)]
+        array $headers = [],
+    ): PaymentInitiationResponse {
+        $payload = json_encode($payment, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+
+        $digest = $this->digest($payload);
+
+        $signatureHeaders = [
+            'Digest' => $digest,
             'X-Request-ID' => (string)Uuid::v4(),
-            'MessageCreateDateTime' => (new DateTimeImmutable())->format('c'),
+            'MessageCreateDateTime' => (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
+            '(Request-Target)' => 'post '.self::BASE_URL,
         ];
 
-        // POST /payments
+        $headers['Signature'] = $this->signature($signatureHeaders);
+        unset($signatureHeaders['(Request-Target)']);
 
-        throw new NotImplemented(__METHOD__);
+        $headers += $signatureHeaders;
+
+        $response = $this->ideal->post(self::BASE_URL, [
+            'headers' => $headers + [
+                'Authorization' => (string)$this->ideal->authorize->token(),
+                'Content-Type' => 'application/json',
+            ],
+            'body' => $payload,
+        ]);
+
+        return $this->denormalize($response, PaymentInitiationResponse::class);
     }
 
     /**
      * Use this operation to retrieve the status of a payment.
      */
-    public function status(string $paymentId): void
-    {
+    public function status(
+        string $paymentId,
+
+        #[ArrayShape(PaymentArrayShapeInterface::PAYMENT_QUERY_PARAMS)]
+        array $query = [],
+
+        #[ArrayShape(PaymentArrayShapeInterface::STATUS_HEADERS)]
+        array $headers = [],
+    ): void {
         // GET /payments/{paymentId}/status
 
         throw new NotImplemented(__METHOD__);

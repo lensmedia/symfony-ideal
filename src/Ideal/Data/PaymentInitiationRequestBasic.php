@@ -36,7 +36,7 @@ class PaymentInitiationRequestBasic implements SerializableRequestData
      *
      * @example ID-0123456789
      */
-    #[Assert\Length(min: 1, max: 35,)]
+    #[Assert\Length(min: 1, max: 35)]
     public ?string $endToEndId = null;
 
     /**
@@ -134,20 +134,20 @@ class PaymentInitiationRequestBasic implements SerializableRequestData
             'UsePreAuthentication' => $this->usePreAuthentication,
             'EndToEndId' => $this->endToEndId,
             'InitiatingPartyReferenceId' => $this->initiatingPartyReferenceId,
-            'PreferredScaMethod' => Util::EnumToString($this->preferredScaMethod),
-            'TransactionType' => Util::EnumToString($this->transactionType),
+            'PreferredScaMethod' => Util::enumToString($this->preferredScaMethod),
+            'TransactionType' => Util::enumToString($this->transactionType),
             'ExpirationPeriod' => $this->expirationPeriod,
             'Amount' => $this->amount,
             'DebtorInformation' => $this->debtorInformation,
             'CreditorInformation' => $this->creditorInformation,
             'ChargeBearer' => $this->chargeBearer,
-            'PurposeCode' => Util::EnumToString($this->purposeCode),
-            'CategoryPurpose' => Util::EnumToString($this->categoryPurpose),
+            'PurposeCode' => Util::enumToString($this->purposeCode),
+            'CategoryPurpose' => Util::enumToString($this->categoryPurpose),
             'PaymentContext' => $this->paymentContext,
             'CrossCurrencyPayments' => $this->crossCurrencyPayments,
             'RegulatoryReportingCodes' => $this->regulatoryReportingCodes,
             'RemittanceInformation' => $this->remittanceInformation,
             'RemittanceInformationStructured' => $this->remittanceInformationStructured,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

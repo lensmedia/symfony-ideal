@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
+use Lens\Bundle\IdealBundle\Ideal\Util;
+
 class CrossCurrencyPayment implements SerializableRequestData
 {
     /**
@@ -23,6 +25,6 @@ class CrossCurrencyPayment implements SerializableRequestData
         return array_filter([
             'CrossCurrencyTransaction' => $this->crossCurrencyTransaction,
             'ExchangeRateInformation' => $this->exchangeRateInformation,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

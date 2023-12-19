@@ -41,9 +41,9 @@ class CreditorDateAndPlaceOfBirth implements SerializableRequestData
     public function jsonSerialize(): array
     {
         return array_filter([
-            'BirthDate' => Util::DateToString($this->birthDate),
+            'BirthDate' => Util::dateToString($this->birthDate),
             'CityOfBirth' => $this->cityOfBirth,
             'CountryOfBirth' => $this->countryOfBirth,
-        ], 'is_null');
+        ], Util::isNotNull(...));
     }
 }

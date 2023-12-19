@@ -6,6 +6,7 @@ namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
 use Lens\Bundle\IdealBundle\Ideal\Configuration;
 use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 
 readonly abstract class Resource
 {
@@ -17,6 +18,21 @@ readonly abstract class Resource
     public function config(): Configuration
     {
         return $this->ideal->config();
+    }
+
+    /**
+     * @template T
+     *
+     * @param array<string, mixed> $data
+     * @param class-string<T> $class
+     *
+     * @return T
+     *
+     * @throws SerializerExceptionInterface
+     */
+    protected function denormalize(array $data, string $class, array $context = []): object
+    {
+        return $this->ideal->denormalize($data, $class, $context);
     }
 
     /**
@@ -36,7 +52,12 @@ readonly abstract class Resource
             $parts[] = sprintf('%s="%s"', $key, $value);
         }
 
-        return 'Signature '.implode(', ', $parts);
+        return 'Signature: '.implode(', ', $parts);
+    }
+
+    protected function digest(string $payload): string
+    {
+        return 'SHA-256='.base64_encode(hash('sha256', $payload, true));
     }
 
     protected function isSuccessfulHttpStatus(int $status): bool

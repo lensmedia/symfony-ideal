@@ -4,29 +4,15 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
-use Symfony\Contracts\HttpClient\ResponseInterface;
-
-readonly class AccessToken
+class AccessToken
 {
-    public function __construct(
-        public string $accessToken,
-        public string $tokenType,
-        public int $expiresIn,
-    ) {
-    }
+    public string $accessToken;
 
-    public static function fromResponse(ResponseInterface $request): AccessToken
-    {
-        $response = $request->toArray();
+    public string $tokenType;
 
-        return new self(
-            $response['access_token'],
-            $response['token_type'],
-            $response['expires_in'],
-        );
-    }
+    public int $expiresIn = 0;
 
-    public function header(): string
+    public function __toString(): string
     {
         return sprintf('%s %s', $this->tokenType, $this->accessToken);
     }
