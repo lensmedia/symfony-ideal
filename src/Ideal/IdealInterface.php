@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal;
 
+use Lens\Bundle\IdealBundle\Ideal\Exception\ErrorResponse;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Authorize;
 use Lens\Bundle\IdealBundle\Ideal\Resource\BulkPayments;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Payments;
@@ -11,11 +12,7 @@ use Lens\Bundle\IdealBundle\Ideal\Resource\PeriodicPayments;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Preferences;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Refunds;
 use Lens\Bundle\IdealBundle\Ideal\Resource\ScheduledPayments;
-use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * @property-read Authorize $authorize
@@ -26,13 +23,13 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @property-read Refunds $refunds
  * @property-read Preferences $preferences
  */
-interface IdealInterface
+interface IdealInterface extends ObjectMapperInterface
 {
-    public const CHECKOUT_PRICE_COMPLETED = 100;
-    public const CHECKOUT_PRICE_CANCELLED = 200;
-    public const CHECKOUT_PRICE_EXPIRED = 300;
-    public const CHECKOUT_PRICE_OPEN = 400;
-    public const CHECKOUT_PRICE_ERROR = 500;
+    public const DEBUG_PRICE_COMPLETED = 1;
+    public const DEBUG_PRICE_CANCELLED = 2;
+    public const DEBUG_PRICE_EXPIRED = 3;
+    public const DEBUG_PRICE_OPEN = 4;
+    public const DEBUG_PRICE_ERROR = 5;
 
     /**
      * Get the configuration.
@@ -42,17 +39,50 @@ interface IdealInterface
     /**
      * @template T
      *
-     * @param array<string, mixed> $data
-     * @param class-string<T> $class
+     * @param class-string<T> $type
      *
-     * @return T
+     * @return T|array
      *
-     * @throws SerializerExceptionInterface
+     * @throws TransportExceptionInterface if the request failed
+     * @throws ErrorResponse if the response is an error response
      */
-    public function denormalize(array $data, string $class, array $context = []): object;
+    public function get(string $url, array $options = [], ?string $type = null): array|object;
 
-    public function get(string $url, array $options = []): array;
-    public function post(string $url, array $options = []): array;
-    public function put(string $url, array $options = []): array;
-    public function delete(string $url, array $options = []): array;
+    /**
+     * @template T
+     *
+     * @param class-string<T> $type
+     *
+     * @return T|array
+     *
+     * @throws TransportExceptionInterface if the request failed
+     * @throws ErrorResponse if the response is an error response
+     */
+    public function post(string $url, array $options = [], ?string $type = null): array|object;
+
+    /**
+     *
+     * @template T
+     *
+     * @param class-string<T> $type
+     *
+     * @return T|array
+     *
+     * @throws TransportExceptionInterface if the request failed
+     * @throws ErrorResponse if the response is an error response
+     */
+    public function put(string $url, array $options = [], ?string $type = null): array|object;
+
+    /**
+     *
+     * @template T
+     *
+     * @param class-string<T> $type
+     *
+     * @return T|array
+     *
+     * @throws TransportExceptionInterface if the request failed
+     * @throws ErrorResponse if the response is an error response
+     */
+    public function delete(string $url, array $options = [], ?string $type = null): array|object;
 }

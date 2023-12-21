@@ -8,23 +8,30 @@ use Lens\Bundle\IdealBundle\Ideal\Exception\InvalidConfiguration;
 use Lens\Bundle\IdealBundle\Ideal\Exception\UnableToGenerateSignature;
 use OpenSSLAsymmetricKey;
 use OpenSSLCertificate;
+use SensitiveParameter;
 
 class Configuration
 {
-    public const DATE_FORMAT = 'c';
-
     private OpenSSLCertificate $publicKey;
     private OpenSSLAsymmetricKey $privateKey;
 
+    public readonly ?string $notificationToken;
+
     public function __construct(
-        public readonly string $merchantId,
+        public readonly string $initiatingPartyId,
         public readonly string $client,
         public readonly string $baseUrl,
-        public readonly string $publicKeyPath,
-        public readonly string $privateKeyPath,
-        public readonly ?string $privateKeyPass = null,
-        public readonly ?string $callbackUrl = null,
+
+        string $publicKeyPath,
+        string $privateKeyPath,
+        #[SensitiveParameter]
+        ?string $privateKeyPass = null,
+
         public readonly int $subId = 0,
+
+        public readonly ?string $notificationPath = null,
+        #[SensitiveParameter]
+        ?string $notificationToken = null,
     ) {
         $this->validateUrl($baseUrl, sprintf(
             'Acquirer URL "%s" is not a valid URL',
@@ -36,30 +43,25 @@ class Configuration
             $publicKeyPath,
         ));
 
-        $this->initializePublicKey($this->publicKeyPath);
+        $this->initializePublicKey($publicKeyPath);
 
         $this->validateFile($privateKeyPath, sprintf(
             'Private key file "%s" does not exist or is not readable',
             $privateKeyPath,
         ));
 
-        $this->initializePrivateKey($this->privateKeyPath, $this->privateKeyPass);
+        $this->initializePrivateKey($privateKeyPath, $privateKeyPass);
 
         $this->validateSubId($subId);
 
-        if ($callbackUrl) {
-            $this->validateUrl($callbackUrl, sprintf(
-                'Callback URL "%s" is not a valid URL',
-                $callbackUrl,
-            ));
-        }
+        $this->notificationToken = $notificationToken;
     }
 
     public function id(): string
     {
         return $this->subId
-            ? sprintf('%s:%d', $this->merchantId, $this->subId)
-            : $this->merchantId;
+            ? sprintf('%s:%d', $this->initiatingPartyId, $this->subId)
+            : $this->initiatingPartyId;
     }
 
     public function client(): string
@@ -118,8 +120,12 @@ class Configuration
         $this->publicKey = $publicKey;
     }
 
-    private function initializePrivateKey(string $privateKeyFile, ?string $privateKeyPass): void
-    {
+    private function initializePrivateKey(
+        string $privateKeyFile,
+
+        #[SensitiveParameter]
+        ?string $privateKeyPass,
+    ): void {
         $privateKey = openssl_pkey_get_private(
             file_get_contents($privateKeyFile),
             $privateKeyPass,

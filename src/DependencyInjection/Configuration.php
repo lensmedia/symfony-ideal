@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 readonly class Configuration implements ConfigurationInterface
 {
-    public function __construct(
-        private string $projectDir,
-    ) {
-    }
-
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('lens_ideal');
@@ -21,17 +17,17 @@ readonly class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->children()
-                ->scalarNode('merchant_id')
-                    ->info('Your initiating party/merchant ID.')
+                ->scalarNode('initiating_party_id')
+                    ->info('Your initiating party ID, e.g. with Rabobank this is your dashboard id.')
                     ->isRequired()
                     ->cannotBeEmpty()
                     ->validate()
                         ->ifTrue(fn ($v) => !preg_match('/^\d+$/', $v))
-                        ->thenInvalid('Merchant ID must be a 9 digit number.')
+                        ->thenInvalid('Initiating party ID must only contain digits.')
                     ->end()
                 ->end()
                 ->scalarNode('sub_id')
-                    ->info('Your sub ID, used if you have multiple contracts under the same merchant ID.')
+                    ->info('Your sub ID, used if you have multiple contracts under the same party.')
                     ->defaultValue(0)
                 ->end()
 
@@ -50,7 +46,6 @@ readonly class Configuration implements ConfigurationInterface
                 ->end()
 
                 ->scalarNode('public_key_path')
-                    ->defaultValue($this->projectDir.'/config/certificates/ideal-public.pem')
                     ->cannotBeEmpty()
                     ->validate()
                         ->ifTrue($this->validateFilePath(...))
@@ -65,7 +60,6 @@ readonly class Configuration implements ConfigurationInterface
                 ->end()
 
                 ->scalarNode('private_key_path')
-                    ->defaultValue($this->projectDir.'/config/certificates/ideal-private.key')
                     ->cannotBeEmpty()
                     ->validate()
                         ->ifTrue($this->validateFilePath(...))
@@ -83,7 +77,30 @@ readonly class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $this->addNotificationSection($rootNode);
+
         return $treeBuilder;
+    }
+
+    private function addNotificationSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('notifications')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('path')
+                            ->info('Name for the controller or URL (absolute/relative) that handles the notifications.')
+                            ->defaultNull()
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->scalarNode('token')
+                            ->defaultNull()
+                            ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
     }
 
     private function validateUrl(?string $value): bool

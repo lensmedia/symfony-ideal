@@ -6,6 +6,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
 use Lens\Bundle\IdealBundle\IdealFactory;
+use Lens\Bundle\IdealBundle\ObjectMapper;
 use Symfony\Component\Serializer\SerializerInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -13,12 +14,17 @@ return static function (ContainerConfigurator $container) {
         ->set(IdealFactory::class)
         ->args([
             abstract_arg('configuration'),
-            service(SerializerInterface::class),
+            service(ObjectMapper::class),
         ])
 
         ->set(IdealInterface::class)
         ->factory([
             service(IdealFactory::class),
             'create',
+        ])
+
+        ->set(ObjectMapper::class)
+        ->args([
+            service(SerializerInterface::class),
         ]);
 };

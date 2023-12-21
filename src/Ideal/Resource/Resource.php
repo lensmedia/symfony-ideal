@@ -6,9 +6,9 @@ namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
 use Lens\Bundle\IdealBundle\Ideal\Configuration;
 use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
-use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
+use Lens\Bundle\IdealBundle\Ideal\ObjectMapperInterface;
 
-readonly abstract class Resource
+readonly abstract class Resource implements ObjectMapperInterface
 {
     public function __construct(
         protected IdealInterface $ideal,
@@ -20,25 +20,15 @@ readonly abstract class Resource
         return $this->ideal->config();
     }
 
-    /**
-     * @template T
-     *
-     * @param array<string, mixed> $data
-     * @param class-string<T> $class
-     *
-     * @return T
-     *
-     * @throws SerializerExceptionInterface
-     */
-    protected function denormalize(array $data, string $class, array $context = []): object
+    public function map(string|array $data, string $type, array $context = []): object
     {
-        return $this->ideal->denormalize($data, $class, $context);
+        return $this->ideal->map($data, $type, $context);
     }
 
     /**
      * Converts header array to signature string.
      */
-    protected function signature(array $headers): string
+    protected function sign(array $headers): array
     {
         $signature = [
             'keyId' => $this->config()->fingerprint(),
@@ -52,16 +42,15 @@ readonly abstract class Resource
             $parts[] = sprintf('%s="%s"', $key, $value);
         }
 
-        return 'Signature: '.implode(', ', $parts);
+        unset($headers['(Request-Target)']);
+
+        $headers['Signature'] = 'Signature '.implode(', ', $parts);
+
+        return $headers;
     }
 
     protected function digest(string $payload): string
     {
         return 'SHA-256='.base64_encode(hash('sha256', $payload, true));
-    }
-
-    protected function isSuccessfulHttpStatus(int $status): bool
-    {
-        return $status >= 200 && $status < 300;
     }
 }

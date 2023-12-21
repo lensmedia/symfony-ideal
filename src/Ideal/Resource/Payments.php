@@ -33,29 +33,30 @@ readonly class Payments extends Resource
     ): PaymentInitiationResponse {
         $payload = json_encode($payment, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
 
-        $digest = $this->digest($payload);
-
-        $signatureHeaders = [
-            'Digest' => $digest,
+        $headers += $this->sign([
+            'Digest' => $this->digest($payload),
             'X-Request-ID' => (string)Uuid::v4(),
             'MessageCreateDateTime' => (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
             '(Request-Target)' => 'post '.self::BASE_URL,
-        ];
-
-        $headers['Signature'] = $this->signature($signatureHeaders);
-        unset($signatureHeaders['(Request-Target)']);
-
-        $headers += $signatureHeaders;
+        ]);
 
         $response = $this->ideal->post(self::BASE_URL, [
             'headers' => $headers + [
-                'Authorization' => (string)$this->ideal->authorize->token(),
+                'Authorization' => $this->ideal->authorize->token()->asAuthorizationHeader(),
                 'Content-Type' => 'application/json',
             ],
             'body' => $payload,
-        ]);
+            'query' => $query,
+        ], PaymentInitiationResponse::class);
 
-        return $this->denormalize($response, PaymentInitiationResponse::class);
+        // This happens on the test site, in production it is a link to the bank.
+        // For the test case, the link is returned to be the return url provided in
+        // the header bypassing the bank entirely.
+        if ('https://worldline.com' === $response->links->redirectUrl->href) {
+            $response->links->redirectUrl->href = $headers['InitiatingPartyReturnUrl'] ?? '/';
+        }
+
+        return $response;
     }
 
     /**

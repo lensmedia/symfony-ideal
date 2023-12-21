@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal;
 
+use Lens\Bundle\IdealBundle\Ideal\Data\Link;
+use Lens\Bundle\IdealBundle\Ideal\Exception\ErrorResponse;
+use Lens\Bundle\IdealBundle\Ideal\Exception\InvalidArgument;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Authorize;
 use Lens\Bundle\IdealBundle\Ideal\Resource\BulkPayments;
 use Lens\Bundle\IdealBundle\Ideal\Resource\Payments;
@@ -13,8 +16,10 @@ use Lens\Bundle\IdealBundle\Ideal\Resource\Refunds;
 use Lens\Bundle\IdealBundle\Ideal\Resource\ScheduledPayments;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 readonly final class Ideal implements IdealInterface
 {
@@ -32,7 +37,7 @@ readonly final class Ideal implements IdealInterface
 
     public function __construct(
         private Configuration $config,
-        private DenormalizerInterface $denormalizer,
+        private ?ObjectMapperInterface $objectMapper = null,
     ) {
         $this->httpClient = HttpClient::createForBaseUri($this->config->baseUrl);
 
@@ -51,33 +56,105 @@ readonly final class Ideal implements IdealInterface
         return $this->config;
     }
 
-    public function denormalize(array $data, string $class, array $context = []): object
+    public function map(string|array $data, string $type, array $context = []): object
     {
-        return $this->denormalizer->denormalize($data, $class, null, $context);
+        return $this->objectMapper->map($data, $type, $context);
     }
 
-    public function get(string $url, array $options = []): array
+    public function get(string $url, array $options = [], ?string $type = null): array|object
     {
-        return $this->request(Request::METHOD_GET, $url, $options);
+        return $this->request(Request::METHOD_GET, $url, $options, $type);
     }
 
-    public function post(string $url, array $options = []): array
+    public function post(string $url, array $options = [], ?string $type = null): array|object
     {
-        return $this->request(Request::METHOD_POST, $url, $options);
+        return $this->request(Request::METHOD_POST, $url, $options, $type);
     }
 
-    public function put(string $url, array $options = []): array
+    public function put(string $url, array $options = [], ?string $type = null): array|object
     {
-        return $this->request(Request::METHOD_PUT, $url, $options);
+        return $this->request(Request::METHOD_PUT, $url, $options, $type);
     }
 
-    public function delete(string $url, array $options = []): array
+    public function delete(string $url, array $options = [], ?string $type = null): array|object
     {
-        return $this->request(Request::METHOD_DELETE, $url, $options);
+        return $this->request(Request::METHOD_DELETE, $url, $options, $type);
     }
 
-    private function request(string $method, string $url, array $options = []): array
+    private function request(string $method, string $url, array $options = [], ?string $type = null): array|object
     {
-        return $this->httpClient->request($method, $url, $options)->toArray();
+        $response = $this->httpClient->request($method, $url, $options);
+        if ($type && $this->objectMapper instanceof ObjectMapperInterface) {
+            return $this->requestWithType($response, $type);
+        }
+
+        try {
+            $data = $response->toArray(false);
+            $data['response'] = $response;
+
+            return $data;
+        } catch (HttpExceptionInterface $exception) {
+            $this->throwErrorResponseException($exception);
+        }
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     */
+    private function requestWithType(ResponseInterface $response, string $type): object
+    {
+        if (!class_exists($type)) {
+            throw new InvalidArgument(sprintf(
+                'Class "%s" does not exist.',
+                $type,
+            ));
+        }
+
+        try {
+            $data = $this->map($response->getContent(), $type);
+            if (is_a($data, IdealResponseInterface::class, true)) {
+                $data->setResponse($response);
+            }
+
+            return $data;
+        } catch (HttpExceptionInterface $exception) {
+            $this->throwErrorResponseException($exception);
+        }
+    }
+
+    private function throwErrorResponseException(HttpExceptionInterface $exception): never
+    {
+        $response = $exception->getResponse();
+
+        $data = $response->toArray(false);
+        if (empty($data)) {
+            $message = trim($response->getContent(false));
+            if (empty($message)) {
+                $message = $exception->getMessage();
+            }
+
+            throw new ErrorResponse(
+                code: 0,
+                statusCode: $response->getStatusCode(),
+                message: $message,
+                headers: $response->getHeaders(false),
+                previous: $exception,
+            );
+        }
+
+        $link = null;
+        if ($data['link']) {
+            $link = $this->map($data['link'], Link::class);
+        }
+
+        throw new ErrorResponse(
+            code: (int)$data['code'],
+            statusCode: $response->getStatusCode(),
+            message: $data['message'],
+            details: $data['details'],
+            link: $link,
+            headers: $response->getHeaders(false),
+            previous: $exception,
+        );
     }
 }

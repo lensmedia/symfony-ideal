@@ -14,24 +14,20 @@ readonly class Authorize extends Resource
     /**
      * Generates a token for the Initiating Party.
      */
-    public function token(bool $debugToken = false): AccessToken
+    public function token(): AccessToken
     {
-        if ($debugToken) {
-            return new AccessToken('97fb13a74c712d8c7a50476e71769eaf', 'Bearer');
-        }
-
         $headers = $this->headers();
 
-        $response = $this->ideal->post(self::BASE_URL.'/token', [
+        $options = [
             'headers' => $headers + [
-                'Authorization' => $this->signature($headers),
-            ],
+                    'Authorization' => $this->sign($headers),
+                ],
             'body' => [
                 'grant_type' => 'client_credentials',
             ],
-        ]);
+        ];
 
-        return $this->denormalize($response, AccessToken::class);
+        return $this->ideal->post(self::BASE_URL.'/token', $options, AccessToken::class);
     }
 
     /**
@@ -47,12 +43,12 @@ readonly class Authorize extends Resource
 
         $this->ideal->post(self::BASE_URL.'/revoke', [
             'headers' => $headers + [
-                    'Authorization' => $this->signature($headers),
-                ],
+                'Authorization' => $this->sign($headers),
+            ],
             'body' => [
                 'token' => $accessToken,
             ],
-        ]);
+        ])->getContent();
     }
 
     private function headers(): array
