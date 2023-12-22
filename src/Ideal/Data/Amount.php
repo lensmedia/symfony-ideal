@@ -74,8 +74,8 @@ class Amount implements SerializableRequestData
     public static function create(
         Money|BigDecimal|string $amount,
         ?AmountType $type = null,
-        ?BigDecimal $minimumAmount = null,
-        ?BigDecimal $maximumAmount = null,
+        BigDecimal|string|null $minimumAmount = null,
+        BigDecimal|string|null $maximumAmount = null,
         Currency|string|null $currency = null,
     ): self {
         if (!($amount instanceof Money) && $currency === null) {
@@ -87,15 +87,11 @@ class Amount implements SerializableRequestData
         }
 
         $instance = new self();
-        $instance->setAmount($amount);
-
         $instance->type = $type;
-        $instance->minimumAmount = $minimumAmount;
-        $instance->maximumAmount = $maximumAmount;
-
-        if ($currency) {
-            $instance->setCurrency($currency);
-        }
+        $instance->setAmount($amount);
+        if ($minimumAmount) { $instance->setMinimumAmount($minimumAmount); }
+        if ($maximumAmount) { $instance->setMaximumAmount($maximumAmount); }
+        if ($currency) { $instance->setCurrency($currency); }
 
         return $instance;
     }
@@ -112,11 +108,25 @@ class Amount implements SerializableRequestData
         }
     }
 
+    public function setMinimumAmount(BigDecimal|string|null $minimumAmount): void
+    {
+        $this->minimumAmount = (null === $minimumAmount)
+            ? null
+            : BigDecimal::of($minimumAmount);
+    }
+
+    public function setMaximumAmount(BigDecimal|string|null $maximumAmount): void
+    {
+        $this->maximumAmount = (null === $maximumAmount)
+            ? null
+            : BigDecimal::of($maximumAmount);
+    }
+
     public function setCurrency(Currency|string|null $currency): void
     {
-        $this->currency = is_string($currency)
-            ? Currency::of($currency)
-            : $currency;
+        $this->currency = (null === $currency)
+            ? null
+            : Currency::of($currency);
     }
 
     public function jsonSerialize(): array

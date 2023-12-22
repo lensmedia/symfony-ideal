@@ -37,6 +37,20 @@ class ExchangeRateInformationRequest implements SerializableRequestData
     #[Assert\Length(max: 256)]
     public ?string $contractIdentification = null;
 
+    public function setUnitCurrency(Currency|string|null $currency): void
+    {
+        $this->unitCurrency = (null === $currency)
+            ? null
+            : Currency::of($currency);
+    }
+
+    public function setExchangeRate(BigDecimal|string|null $exchangeRate): void
+    {
+        $this->exchangeRate = (null === $exchangeRate)
+            ? null
+            : BigDecimal::of($exchangeRate);
+    }
+
     public function jsonSerialize(): array
     {
         return array_filter([

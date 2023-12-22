@@ -29,7 +29,6 @@ class Configuration
 
         public readonly int $subId = 0,
 
-        public readonly ?string $notificationPath = null,
         #[SensitiveParameter]
         ?string $notificationToken = null,
     ) {

@@ -7,16 +7,21 @@ namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 use DateTimeImmutable;
 use DateTimeInterface;
 use JetBrains\PhpStorm\ArrayShape;
+use JsonException;
+use Lens\Bundle\IdealBundle\Ideal\Data\PaymentDetailedInformation;
 use Lens\Bundle\IdealBundle\Ideal\Data\PaymentInitiationRequest;
 use Lens\Bundle\IdealBundle\Ideal\Data\PaymentInitiationResponse;
 use Lens\Bundle\IdealBundle\Ideal\Exception\NotImplemented;
+use Lens\Bundle\IdealBundle\Ideal\Exception\UnableToEncodeData;
+use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
 use Symfony\Component\Uid\Uuid;
 
 readonly class Payments extends Resource
 {
     use PaymentTrait;
+    use PaymentArrayShapeTrait;
 
-    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3/payments';
+    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/'.IdealInterface::VERSION.'/payments';
 
     /**
      * Use this operation to initiate a payment on behalf of the Payment Service User. Strong customer authentication
@@ -25,13 +30,17 @@ readonly class Payments extends Resource
     public function create(
         PaymentInitiationRequest $payment,
 
-        #[ArrayShape(PaymentArrayShapeInterface::PAYMENT_QUERY_PARAMS)]
+        #[ArrayShape(self::PAYMENT_QUERY_PARAMS)]
         array $query = [],
 
-        #[ArrayShape(PaymentArrayShapeInterface::PAYMENT_HEADERS)]
+        #[ArrayShape(self::PAYMENT_HEADERS)]
         array $headers = [],
     ): PaymentInitiationResponse {
-        $payload = json_encode($payment, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        try {
+            $payload = json_encode($payment, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        } catch (JsonException $e) {
+            throw new UnableToEncodeData($e->getMessage(), $e->getCode(), $e);
+        }
 
         $headers += $this->sign([
             'Digest' => $this->digest($payload),
@@ -42,19 +51,28 @@ readonly class Payments extends Resource
 
         $response = $this->ideal->post(self::BASE_URL, [
             'headers' => $headers + [
-                'Authorization' => $this->ideal->authorize->token()->asAuthorizationHeader(),
+                'Authorization' => $this->authorizationHeader(),
                 'Content-Type' => 'application/json',
             ],
             'body' => $payload,
             'query' => $query,
         ], PaymentInitiationResponse::class);
 
+        // Add some context to the return url.
+        $href = &$response->links->redirectUrl->href;
+
         // This happens on the test site, in production it is a link to the bank.
         // For the test case, the link is returned to be the return url provided in
         // the header bypassing the bank entirely.
-        if ('https://worldline.com' === $response->links->redirectUrl->href) {
-            $response->links->redirectUrl->href = $headers['InitiatingPartyReturnUrl'] ?? '/';
+        if ('https://worldline.com' === $href) {
+            $href = $headers['InitiatingPartyReturnUrl'] ?? '/';
         }
+
+        $href .= (str_contains($href, '?') ? '&' : '?').http_build_query([
+            'endToEndId' => $payment->commonPaymentData->endToEndId,
+            'paymentId' => $response->commonPaymentData->paymentId,
+            'aspspPaymentId' => $response->commonPaymentData->aspspPaymentId,
+        ]);
 
         return $response;
     }
@@ -65,15 +83,27 @@ readonly class Payments extends Resource
     public function status(
         string $paymentId,
 
-        #[ArrayShape(PaymentArrayShapeInterface::PAYMENT_QUERY_PARAMS)]
+        #[ArrayShape(self::PAYMENT_QUERY_PARAMS)]
         array $query = [],
 
-        #[ArrayShape(PaymentArrayShapeInterface::STATUS_HEADERS)]
+        #[ArrayShape(self::STATUS_HEADERS)]
         array $headers = [],
-    ): void {
-        // GET /payments/{paymentId}/status
+    ): PaymentDetailedInformation {
+        $requestTarget = self::BASE_URL.'/'.$paymentId.'/status';
 
-        throw new NotImplemented(__METHOD__);
+        $headers += $this->sign([
+            'Digest' => $this->digest(''),
+            'X-Request-ID' => (string)Uuid::v4(),
+            'MessageCreateDateTime' => (new DateTimeImmutable())->format(DateTimeInterface::ATOM),
+            '(Request-Target)' => 'get '.$requestTarget,
+        ]);
+
+        return $this->ideal->get($requestTarget, [
+            'headers' => $headers + [
+                'Authorization' => $this->authorizationHeader(),
+            ],
+            'query' => $query,
+        ], PaymentDetailedInformation::class);
     }
 
     /**

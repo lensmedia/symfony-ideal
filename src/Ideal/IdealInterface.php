@@ -25,16 +25,25 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  */
 interface IdealInterface extends ObjectMapperInterface
 {
-    public const DEBUG_PRICE_COMPLETED = 1;
-    public const DEBUG_PRICE_CANCELLED = 2;
-    public const DEBUG_PRICE_EXPIRED = 3;
-    public const DEBUG_PRICE_OPEN = 4;
-    public const DEBUG_PRICE_ERROR = 5;
+    public const APP = 'IDEAL';
+    public const VERSION = 'v3';
+
+    public const DEBUG_PRICE_COMPLETED = '1.00';
+    public const DEBUG_PRICE_CANCELLED = '2.00';
+    public const DEBUG_PRICE_EXPIRED = '3.00';
+    public const DEBUG_PRICE_OPEN = '4.00';
+    public const DEBUG_PRICE_ERROR = '5.00';
 
     /**
      * Get the configuration.
      */
     public function config(): Configuration;
+
+    /**
+     * Returns true if the provided notification token is the same as configured. The notification token
+     * is set in the Rabobank dashboard.
+     */
+    public function isNotificationTokenValid(string $token): bool;
 
     /**
      * @template T

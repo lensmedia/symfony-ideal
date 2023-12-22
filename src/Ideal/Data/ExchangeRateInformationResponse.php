@@ -41,4 +41,18 @@ class ExchangeRateInformationResponse
      * Expiration date time. ISO 8601 DateTime.
      */
     public ?DateTimeImmutable $expirationDateTime = null;
+
+    public function setUnitCurrency(Currency|string|null $currency): void
+    {
+        $this->unitCurrency = (null === $currency)
+            ? null
+            : Currency::of($currency);
+    }
+
+    public function setExchangeRate(BigDecimal|string|null $exchangeRate): void
+    {
+        $this->exchangeRate = (null === $exchangeRate)
+            ? null
+            : BigDecimal::of($exchangeRate);
+    }
 }

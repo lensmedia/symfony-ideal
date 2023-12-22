@@ -10,7 +10,7 @@ readonly class PeriodicPayments extends Resource
 {
     use PaymentTrait;
 
-    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3';
+    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3/periodic-payments';
 
     /**
      * Use this operation to initiate a payment on behalf of the Payment Service User. Strong customer authentication
@@ -18,7 +18,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function create(): void
     {
-        // POST /periodic-payments
+        // POST
 
         throw new NotImplemented(__METHOD__);
     }
@@ -28,7 +28,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function status(string $paymentId): void
     {
-        // GET /periodic-payments/{paymentId}/status
+        // GET /{paymentId}/status
 
         throw new NotImplemented(__METHOD__);
     }
@@ -40,7 +40,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function confirmation(string $paymentId): void
     {
-        // POST /periodic-payments/{paymentId}/confirmation
+        // POST /{paymentId}/confirmation
 
         throw new NotImplemented(__METHOD__);
     }
@@ -51,7 +51,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function identification(string $paymentId): void
     {
-        // POST /periodic-payments/{paymentId}/identification
+        // POST /{paymentId}/identification
 
         throw new NotImplemented(__METHOD__);
     }
@@ -63,7 +63,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function authorize(string $paymentId): void
     {
-        // POST /periodic-payments/{paymentId}/authorizations
+        // POST /{paymentId}/authorizations
 
         throw new NotImplemented(__METHOD__);
     }
@@ -73,7 +73,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function changeAuthorization(string $paymentId, string $authorisationId): void
     {
-        // POST /periodic-payments/{paymentId}/authorizations/{authorisationId}
+        // POST /{paymentId}/authorizations/{authorisationId}
 
         throw new NotImplemented(__METHOD__);
     }
@@ -84,7 +84,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function delete(string $paymentId): void
     {
-        // DELETE /periodic-payments/{paymentId}
+        // DELETE /{paymentId}
 
         throw new NotImplemented(__METHOD__);
     }
@@ -94,7 +94,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function cancellationIdentification(string $paymentId): void
     {
-        // POST /periodic-payments/{paymentId}/cancellation-identification
+        // POST /{paymentId}/cancellation-identification
 
         throw new NotImplemented(__METHOD__);
     }
@@ -104,7 +104,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function cancellationAuthorizations(string $paymentId): void
     {
-        // POST /periodic-payments/{paymentId}/cancellation-authorizations
+        // POST /{paymentId}/cancellation-authorizations
 
         throw new NotImplemented(__METHOD__);
     }
@@ -114,7 +114,7 @@ readonly class PeriodicPayments extends Resource
      */
     public function cancellationAuthorization(string $paymentId, string $authorisationId): void
     {
-        // PUT /periodic-payments/{paymentId}/cancellation-authorizations/{authorisationId}
+        // PUT /{paymentId}/cancellation-authorizations/{authorisationId}
 
         throw new NotImplemented(__METHOD__);
     }

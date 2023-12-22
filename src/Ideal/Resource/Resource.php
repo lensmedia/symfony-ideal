@@ -28,7 +28,7 @@ readonly abstract class Resource implements ObjectMapperInterface
     /**
      * Converts header array to signature string.
      */
-    protected function sign(array $headers): array
+    protected function sign(array $headers, bool $useAuthorizationHeaderInsteadOfSignature = false): array
     {
         $signature = [
             'keyId' => $this->config()->fingerprint(),
@@ -44,7 +44,11 @@ readonly abstract class Resource implements ObjectMapperInterface
 
         unset($headers['(Request-Target)']);
 
-        $headers['Signature'] = 'Signature '.implode(', ', $parts);
+        $header = $useAuthorizationHeaderInsteadOfSignature
+            ? 'Authorization'
+            : 'Signature';
+
+        $headers[$header] = 'Signature '.implode(', ', $parts);
 
         return $headers;
     }
@@ -52,5 +56,10 @@ readonly abstract class Resource implements ObjectMapperInterface
     protected function digest(string $payload): string
     {
         return 'SHA-256='.base64_encode(hash('sha256', $payload, true));
+    }
+
+    protected function authorizationHeader(): string
+    {
+        return $this->ideal->authorize->token()->asAuthorizationHeader();
     }
 }

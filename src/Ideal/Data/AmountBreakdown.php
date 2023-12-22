@@ -34,12 +34,19 @@ class AmountBreakdown implements SerializableRequestData
     #[Assert\NotBlank]
     public BigDecimal $shippingCost;
 
-    public function __construct(
-        BigDecimal $orderAmount,
-        ?BigDecimal $shippingCost = null,
-    ) {
-        $this->orderAmount = $orderAmount;
-        $this->shippingCost = $shippingCost ?? BigDecimal::zero();
+    public function __construct()
+    {
+        $this->shippingCost = BigDecimal::zero();
+    }
+
+    public function setOrderAmount(BigDecimal|string $orderAmount): void
+    {
+        $this->orderAmount = BigDecimal::of($orderAmount);
+    }
+
+    public function setShippingCost(BigDecimal|string|null $shippingCost= null): void
+    {
+        $this->shippingCost = BigDecimal::of($shippingCost ?? '0');
     }
 
     public function jsonSerialize(): array

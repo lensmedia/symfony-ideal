@@ -33,6 +33,13 @@ class CreditorAccount implements SerializableRequestData
      */
     public ?Currency $currency = null;
 
+    public function setCurrency(Currency|string|null $currency): void
+    {
+        $this->currency = (null === $currency)
+            ? null
+            : Currency::of($currency);
+    }
+
     public function jsonSerialize(): array
     {
         return array_filter([

@@ -23,8 +23,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 readonly final class Ideal implements IdealInterface
 {
-    public const APP = 'IDEAL';
-
     public Authorize $authorize;
     public Payments $payments;
     public ScheduledPayments $scheduledPayments;
@@ -56,6 +54,11 @@ readonly final class Ideal implements IdealInterface
         return $this->config;
     }
 
+    public function isNotificationTokenValid(string $token): bool
+    {
+        return $this->config()->notificationToken === $token;
+    }
+
     public function map(string|array $data, string $type, array $context = []): object
     {
         return $this->objectMapper->map($data, $type, $context);
@@ -83,13 +86,25 @@ readonly final class Ideal implements IdealInterface
 
     private function request(string $method, string $url, array $options = [], ?string $type = null): array|object
     {
+        $headers = &$options['headers'];
+        if (isset($headers['InitiatingPartyNotificationUrl']) && !isset($headers['NotificationVersion'])) {
+            if (!preg_match('~^https?://~', $headers['InitiatingPartyNotificationUrl'])) {
+                throw new InvalidArgument(sprintf(
+                    'The "InitiatingPartyNotificationUrl" header must be a full URL, "%s" given.',
+                    $headers['InitiatingPartyNotificationUrl'],
+                ));
+            }
+
+            $headers['NotificationVersion'] = IdealInterface::VERSION;
+        }
+
         $response = $this->httpClient->request($method, $url, $options);
         if ($type && $this->objectMapper instanceof ObjectMapperInterface) {
             return $this->requestWithType($response, $type);
         }
 
         try {
-            $data = $response->toArray(false);
+            $data = $response->toArray();
             $data['response'] = $response;
 
             return $data;
@@ -143,15 +158,15 @@ readonly final class Ideal implements IdealInterface
         }
 
         $link = null;
-        if ($data['link']) {
+        if (isset($data['link'])) {
             $link = $this->map($data['link'], Link::class);
         }
 
         throw new ErrorResponse(
             code: (int)$data['code'],
             statusCode: $response->getStatusCode(),
-            message: $data['message'],
-            details: $data['details'],
+            message: $data['message'] ?? 'Unknown error.',
+            details: $data['details'] ?? null,
             link: $link,
             headers: $response->getHeaders(false),
             previous: $exception,

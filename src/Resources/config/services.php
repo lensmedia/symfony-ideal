@@ -7,6 +7,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
 use Lens\Bundle\IdealBundle\IdealFactory;
 use Lens\Bundle\IdealBundle\ObjectMapper;
+use Lens\Bundle\IdealBundle\Serializer\Normalizer\BigDecimalDenormalizer;
+use Lens\Bundle\IdealBundle\Serializer\Normalizer\CurrencyDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -26,5 +28,11 @@ return static function (ContainerConfigurator $container) {
         ->set(ObjectMapper::class)
         ->args([
             service(SerializerInterface::class),
-        ]);
+        ])
+
+        ->set(BigDecimalDenormalizer::class)
+        ->tag('serializer.normalizer')
+
+        ->set(CurrencyDenormalizer::class)
+        ->tag('serializer.normalizer');
 };

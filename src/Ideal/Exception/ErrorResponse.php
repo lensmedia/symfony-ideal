@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Lens\Bundle\IdealBundle\Ideal\Exception;
 
 use Lens\Bundle\IdealBundle\Ideal\Data\Link;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use RuntimeException;
 use Throwable;
 
-class ErrorResponse extends HttpException implements IdealExceptionInterface
+class ErrorResponse extends RuntimeException implements IdealExceptionInterface
 {
     public const CODES = [
         /** 400 */
@@ -74,13 +74,17 @@ class ErrorResponse extends HttpException implements IdealExceptionInterface
 
     public function __construct(
         int $code,
-        int $statusCode,
+        public readonly int $statusCode,
         string $message,
         public readonly ?string $details = null,
         public readonly ?Link $link = null,
-        array $headers = [],
+        public readonly array $headers = [],
         Throwable $previous = null,
     ) {
-        parent::__construct($statusCode, $message, $previous, $headers, $code);
+        if ($details) {
+            $message .= ': '.$details;
+        }
+
+        parent::__construct($message, $code, $previous);
     }
 }

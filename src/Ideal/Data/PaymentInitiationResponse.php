@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Data;
 
-/**
- * Payment Initiation Response
- */
-class PaymentInitiationResponse
+use Lens\Bundle\IdealBundle\Ideal\IdealResponse;
+
+class PaymentInitiationResponse extends IdealResponse
 {
     public CommonPaymentDataResponse $commonPaymentData;
 

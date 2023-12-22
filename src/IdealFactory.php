@@ -37,7 +37,6 @@ final readonly class IdealFactory
             privateKeyPath: $this->config['private_key_path'],
             privateKeyPass: $this->config['private_key_pass'],
 
-            notificationPath: $this->config['notifications']['path'],
             notificationToken: $this->config['notifications']['token'],
         );
 

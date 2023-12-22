@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
-interface PaymentArrayShapeInterface
+trait PaymentArrayShapeTrait
 {
     public const PAYMENT_QUERY_PARAMS = [
         /**
@@ -35,9 +35,9 @@ interface PaymentArrayShapeInterface
          * The URL which will be used for notification service request. The Open Banking Service supports two ways
          * in which this field can be filled:
          *
-         * Option A) with an URL ending on /v2 or /v3, indicating the version of the Notification API implemented by
+         * Option A) with a URL ending on /v2 or /v3, indicating the version of the Notification API implemented by
          * the Initiating Party. In this case the URL called for notifications will be extended with
-         * /notification/status by the Open Banking Service. The 'NotificationVersion' field MUST NOT be filled.
+         * /notification/status by the Open Banking Service. URL Matching pattern includes query parameters.
          *
          * Option B) with a full URL. The version information MUST BE provided in the 'NotificationVersion' field.
          * In this case the provided URL will not be extended, and used as-is.

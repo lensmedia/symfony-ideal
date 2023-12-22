@@ -22,6 +22,16 @@ trait MoneyTrait
      */
     public BigDecimal $amount;
 
+    public function setCurrency(Currency|string $currency): void
+    {
+        $this->currency = Currency::of($currency);
+    }
+
+    public function setAmount(BigDecimal|string $amount): void
+    {
+        $this->amount = BigDecimal::of($amount);
+    }
+
     public function asMoney(): Money
     {
         return Money::of($this->amount, $this->currency);

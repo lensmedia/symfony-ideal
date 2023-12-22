@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
 use Lens\Bundle\IdealBundle\Ideal\Exception\NotImplemented;
+use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
 
 readonly class Refunds extends Resource
 {
-    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/v3';
+    private const BASE_URL = '/xs2a/routingservice/services/ob/pis/'.IdealInterface::VERSION.'/refunds';
 
     /**
      * Use this operation to initiate an order for refunds containing more than 1 refund instruction.
      */
     public function create(): void
     {
-        // POST /refunds
+        // POST
 
         throw new NotImplemented(__METHOD__);
     }
@@ -25,7 +26,7 @@ readonly class Refunds extends Resource
      */
     public function status(string $refundId): void
     {
-        // GET /refunds/{refundId}/status
+        // GET /{refundId}/status
 
         throw new NotImplemented(__METHOD__);
     }
@@ -35,7 +36,7 @@ readonly class Refunds extends Resource
      */
     public function confirmation(string $refundId): void
     {
-        // POST /refunds/{refundId}/confirmation
+        // POST /{refundId}/confirmation
 
         throw new NotImplemented(__METHOD__);
     }
@@ -46,7 +47,7 @@ readonly class Refunds extends Resource
      */
     public function identification(string $refundId): void
     {
-        // POST /refunds/{refundId}/identification
+        // POST /{refundId}/identification
 
         throw new NotImplemented(__METHOD__);
     }
@@ -56,7 +57,7 @@ readonly class Refunds extends Resource
      */
     public function authorise(string $refundId): void
     {
-        // POST /refunds/{refundId}/authorisations
+        // POST /{refundId}/authorisations
 
         throw new NotImplemented(__METHOD__);
     }
@@ -66,7 +67,7 @@ readonly class Refunds extends Resource
      */
     public function changeAuthorisation(string $refundId): void
     {
-        // PUT /refunds/{refundId}/authorisations/{authorisationId}
+        // PUT /{refundId}/authorisations/{authorisationId}
         throw new NotImplemented(__METHOD__);
     }
 }

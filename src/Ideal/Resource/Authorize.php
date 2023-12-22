@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lens\Bundle\IdealBundle\Ideal\Resource;
 
 use Lens\Bundle\IdealBundle\Ideal\Data\AccessToken;
-use Lens\Bundle\IdealBundle\Ideal\Ideal;
+use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
 
 readonly class Authorize extends Resource
 {
@@ -19,9 +19,7 @@ readonly class Authorize extends Resource
         $headers = $this->headers();
 
         $options = [
-            'headers' => $headers + [
-                    'Authorization' => $this->sign($headers),
-                ],
+            'headers' => $this->sign($headers, useAuthorizationHeaderInsteadOfSignature: true),
             'body' => [
                 'grant_type' => 'client_credentials',
             ],
@@ -42,19 +40,17 @@ readonly class Authorize extends Resource
         $headers = $this->headers();
 
         $this->ideal->post(self::BASE_URL.'/revoke', [
-            'headers' => $headers + [
-                'Authorization' => $this->sign($headers),
-            ],
+            'headers' => $this->sign($headers, useAuthorizationHeaderInsteadOfSignature: true),
             'body' => [
                 'token' => $accessToken,
             ],
-        ])->getContent();
+        ]);
     }
 
     private function headers(): array
     {
         return [
-            'App' => Ideal::APP,
+            'App' => IdealInterface::APP,
             'Client' => $this->config()->client(),
             'Id' => $this->config()->id(),
             'Date' => date('c'),

@@ -73,11 +73,6 @@ class Util
         return $timestamp->format('Y-m-d');
     }
 
-    public static function dateTimeToString(DateTimeInterface $timestamp): string
-    {
-        return $timestamp->format('c');
-    }
-
     public static function isNotNull(mixed $value): bool
     {
         return $value !== null;
