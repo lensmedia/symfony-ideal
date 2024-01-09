@@ -124,9 +124,9 @@ class Amount implements SerializableRequestData
 
     public function setCurrency(Currency|string|null $currency): void
     {
-        $this->currency = (null === $currency)
-            ? null
-            : Currency::of($currency);
+        $this->currency = is_string($currency)
+            ? Currency::of($currency)
+            : $currency;
     }
 
     public function jsonSerialize(): array

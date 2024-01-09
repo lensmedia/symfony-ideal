@@ -24,7 +24,9 @@ trait MoneyTrait
 
     public function setCurrency(Currency|string $currency): void
     {
-        $this->currency = Currency::of($currency);
+        $this->currency = is_string($currency)
+            ? Currency::of($currency)
+            : $currency;
     }
 
     public function setAmount(BigDecimal|string $amount): void

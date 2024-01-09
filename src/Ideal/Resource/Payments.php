@@ -66,6 +66,10 @@ readonly class Payments extends Resource
         // the header bypassing the bank entirely.
         if ('https://worldline.com' === $href) {
             $href = $headers['InitiatingPartyReturnUrl'] ?? '/';
+
+            // Artificially delay the response to give the bank time to process the "payment".
+            // If we don't have this all status checks return as open, which is annoying.
+            sleep(10);
         }
 
         $href .= (str_contains($href, '?') ? '&' : '?').http_build_query([
