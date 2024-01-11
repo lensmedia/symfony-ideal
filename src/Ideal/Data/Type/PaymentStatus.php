@@ -34,8 +34,8 @@ enum PaymentStatus: string
             'OPEN' => self::Open,
             'COMPLETED' => self::SettlementCompleted,
             'CANCELLED' => self::Cancelled,
-            'ERROR' => self::Error,
-            'FAILURE' => self::Expired,
+            'EXPIRED' => self::Expired,
+            'FAILURE' => self::Error,
             default => throw new RuntimeException(sprintf(
                 'Unknown legacy iDEAL transaction status "%s".',
                 $oldStatus,
@@ -52,8 +52,8 @@ enum PaymentStatus: string
             self::Open => 'Open',
             self::SettlementCompleted => 'Completed',
             self::Cancelled => 'Cancelled',
-            self::Error => 'Error',
-            self::Expired => 'Failure',
+            self::Expired => 'Expired',
+            self::Error => 'Failure',
             default => throw new RuntimeException(sprintf(
                 'iDEAL PaymentStatus "%s" does not have an original variant.',
                 $status->value,
