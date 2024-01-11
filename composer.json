@@ -3,20 +3,20 @@
     "description": "\"Private\" bundle for handling iDeal transactions",
     "license": "proprietary",
     "type": "symfony-bundle",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "require": {
         "php": ">=8.2",
         "ext-openssl": "*",
         "brick/money": "*",
         "symfony/framework-bundle": "*",
         "symfony/http-client": "*",
-        "symfony/monolog-bundle": "^3.10",
+        "symfony/monolog-bundle": "*",
         "symfony/uid": "*",
         "symfony/validator": "*",
         "symfony/serializer-pack": "*"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "^2.40"
+        "ergebnis/composer-normalize": "*"
     },
     "autoload": {
         "psr-4": {
