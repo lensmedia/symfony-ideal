@@ -32,7 +32,7 @@ enum PaymentStatus: string
 
         return match (strtoupper($oldStatus)) {
             'OPEN' => self::Open,
-            'COMPLETED' => self::SettlementCompleted,
+            'SUCCESS' => self::SettlementCompleted,
             'CANCELLED' => self::Cancelled,
             'EXPIRED' => self::Expired,
             'FAILURE' => self::Error,
@@ -50,7 +50,7 @@ enum PaymentStatus: string
     {
         return match ($status) {
             self::Open => 'Open',
-            self::SettlementCompleted => 'Completed',
+            self::SettlementCompleted => 'Success',
             self::Cancelled => 'Cancelled',
             self::Expired => 'Expired',
             self::Error => 'Failure',
