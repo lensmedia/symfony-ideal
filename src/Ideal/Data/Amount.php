@@ -29,6 +29,13 @@ class Amount implements SerializableRequestData
      *
      * Pattern: ^\d{1,13}\.\d{1,5}$
      *
+     * When testing:
+     * € 1,00 SettlementCompleted (or any other value not matching the ones below)
+     * € 2,00 Cancelled
+     * € 3,00 Expired
+     * € 4,00 Open
+     * € 5,00 Error
+     *
      * @example 123.45
      */
     #[Assert\NotBlank]
