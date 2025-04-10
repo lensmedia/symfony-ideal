@@ -47,6 +47,16 @@ class PaymentInitiationRequest implements SerializableRequestData
 
     public ?IdealPayments $idealPayments = null;
 
+    /**
+     * Delay in seconds after the TEST transaction is completed this gives the ASPSP time to
+     * process the transaction and return a status instead of always returning as "OPEN".
+     *
+     * This does however mean that every TEST transaction will be delayed by this amount of time.
+     *
+     * @see Lens\Bundle\IdealBundle\Ideal\Resource\Payments
+     */
+    public int $delayTestTransactionsOnCompletion = 10;
+
     public function jsonSerialize(): array
     {
         return array_filter([

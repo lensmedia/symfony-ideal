@@ -69,7 +69,7 @@ readonly class Payments extends Resource
 
             // Artificially delay the response to give the bank time to process the "payment".
             // If we don't have this all status checks return as open, which is annoying.
-            sleep(10);
+            sleep($payment->delayTestTransactionsOnCompletion);
         }
 
         $href .= (str_contains($href, '?') ? '&' : '?').http_build_query([
