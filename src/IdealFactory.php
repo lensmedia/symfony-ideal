@@ -7,6 +7,7 @@ namespace Lens\Bundle\IdealBundle;
 use Lens\Bundle\IdealBundle\Ideal\Configuration;
 use Lens\Bundle\IdealBundle\Ideal\Ideal;
 use Lens\Bundle\IdealBundle\Ideal\ObjectMapperInterface;
+use SensitiveParameter;
 
 /**
  * Used to create an instance of the iDEAL client using values defined in the symfony configuration files.
@@ -18,6 +19,7 @@ use Lens\Bundle\IdealBundle\Ideal\ObjectMapperInterface;
 final readonly class IdealFactory
 {
     public function __construct(
+        #[SensitiveParameter]
         private array $config,
         private ObjectMapperInterface $objectMapper,
     ) {

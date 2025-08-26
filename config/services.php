@@ -9,9 +9,8 @@ use Lens\Bundle\IdealBundle\IdealFactory;
 use Lens\Bundle\IdealBundle\ObjectMapper;
 use Lens\Bundle\IdealBundle\Serializer\Normalizer\BigDecimalDenormalizer;
 use Lens\Bundle\IdealBundle\Serializer\Normalizer\CurrencyDenormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $container->services()
         ->set(IdealFactory::class)
         ->args([
@@ -27,7 +26,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set(ObjectMapper::class)
         ->args([
-            service(SerializerInterface::class),
+            service('serializer.lens_ideal'),
         ])
 
         ->set(BigDecimalDenormalizer::class)

@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace Lens\Bundle\IdealBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 
-readonly class Configuration implements ConfigurationInterface
-{
-    public function getConfigTreeBuilder(): TreeBuilder
-    {
-        $treeBuilder = new TreeBuilder('lens_ideal');
+return static function (DefinitionConfigurator $definition): void {
+    (new class {
+        public function __invoke(ArrayNodeDefinition $node): void
+        {
+            $this->addBasicNodes($node);
+            $this->addNotificationSectionNodes($node);
+        }
 
-        $rootNode = $treeBuilder->getRootNode();
-        $rootNode
-            ->children()
+        private function addBasicNodes(ArrayNodeDefinition $node): void
+        {
+            $node->children()
                 ->scalarNode('initiating_party_id')
                     ->info('Your initiating party ID, e.g. with Rabobank this is your dashboard id.')
                     ->isRequired()
@@ -76,16 +77,11 @@ readonly class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+        }
 
-        $this->addNotificationSection($rootNode);
-
-        return $treeBuilder;
-    }
-
-    private function addNotificationSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
+        private function addNotificationSectionNodes(ArrayNodeDefinition $node): void
+        {
+            $node->children()
                 ->arrayNode('notifications')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -96,15 +92,16 @@ readonly class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
-    }
+        }
 
-    private function validateUrl(?string $value): bool
-    {
-        return $value && !preg_match('/^https?:\/\//', $value);
-    }
+        private function validateUrl(?string $value): bool
+        {
+            return $value && !preg_match('/^https?:\/\//', $value);
+        }
 
-    private function validateFilePath(?string $path): bool
-    {
-        return $path && (!file_exists($path) || !is_readable($path));
-    }
-}
+        private function validateFilePath(?string $path): bool
+        {
+            return $path && (!file_exists($path) || !is_readable($path));
+        }
+    })($definition->rootNode());
+};
