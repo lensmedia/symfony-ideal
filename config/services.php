@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Lens\Bundle\IdealBundle\Command\PaymentStatusCommand;
 use Lens\Bundle\IdealBundle\Ideal\IdealInterface;
 use Lens\Bundle\IdealBundle\IdealFactory;
 use Lens\Bundle\IdealBundle\ObjectMapper;
@@ -33,5 +34,12 @@ return static function (ContainerConfigurator $container): void {
         ->tag('serializer.normalizer')
 
         ->set(CurrencyDenormalizer::class)
-        ->tag('serializer.normalizer');
+        ->tag('serializer.normalizer')
+
+        ->set(PaymentStatusCommand::class)
+        ->tag('console.command')
+        ->args([
+            service(IdealInterface::class),
+        ])
+    ;
 };

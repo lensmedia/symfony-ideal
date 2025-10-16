@@ -3,7 +3,7 @@
     "description": "\"Private\" bundle for handling iDeal transactions",
     "license": "proprietary",
     "type": "symfony-bundle",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "require": {
         "php": ">=8.2",
         "ext-openssl": "*",
@@ -14,7 +14,9 @@
         "symfony/uid": "*",
         "symfony/validator": "*",
         "symfony/serializer-pack": "*",
-        "symfony/serializer": "^7.2"
+        "symfony/serializer": "^7.3",
+        "symfony/console": "^7.3",
+        "symfony/var-dumper": "^7.3"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "*"
