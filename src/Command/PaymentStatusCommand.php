@@ -14,10 +14,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-#[AsCommand(name: self::NAME)]
+#[AsCommand(name: self::NAME, description: 'Check the status of an iDEAL payment.')]
 class PaymentStatusCommand extends Command
 {
-    public const NAME = 'lens:ideal:payment:status';
+    public const string NAME = 'lens:ideal:payment:status';
 
     public function __construct(
         private readonly Ideal $ideal,
@@ -27,7 +27,6 @@ class PaymentStatusCommand extends Command
 
     protected function configure(): void
     {
-        $this->setHelp('Check the status of an iDEAL payment.');
         $this->addArgument('id', InputArgument::REQUIRED, 'The iDEAL payment ID (numeric).');
     }
 
