@@ -45,7 +45,18 @@ class Util
             $money = $money->getAmount();
         }
 
-        return (string)$money->toScale(2, RoundingMode::HALF_UP);
+        return (string)$money->toScale(2, self::halfUp());
+    }
+
+    /**
+     * brick/math renamed the upper snake case rounding constants to pascal case in 0.15, keep both usable so the
+     * bundle is not pinned to a single brick/math major.
+     */
+    private static function halfUp(): RoundingMode|int
+    {
+        return defined(RoundingMode::class.'::HalfUp')
+            ? constant(RoundingMode::class.'::HalfUp')
+            : constant(RoundingMode::class.'::HALF_UP');
     }
 
     public static function currencyToString(Money|Currency|array|null $currency): string|array|null

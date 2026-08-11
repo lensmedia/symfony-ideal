@@ -11,7 +11,9 @@ class BigDecimalDenormalizer implements DenormalizerInterface
 {
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): BigDecimal
     {
-        return BigDecimal::of($data);
+        return is_float($data)
+            ? BigDecimal::fromFloatShortest($data)
+            : BigDecimal::of($data);
     }
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool

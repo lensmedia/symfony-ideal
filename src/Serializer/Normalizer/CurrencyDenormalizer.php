@@ -11,7 +11,9 @@ class CurrencyDenormalizer implements DenormalizerInterface
 {
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Currency
     {
-        return Currency::of($data);
+        return is_int($data)
+            ? Currency::ofNumericCode($data)
+            : Currency::of($data);
     }
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool

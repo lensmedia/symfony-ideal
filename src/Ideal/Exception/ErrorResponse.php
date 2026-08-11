@@ -79,7 +79,7 @@ class ErrorResponse extends RuntimeException implements IdealExceptionInterface
         public readonly ?string $details = null,
         public readonly ?Link $link = null,
         public readonly array $headers = [],
-        Throwable $previous = null,
+        ?Throwable $previous = null,
     ) {
         if ($details) {
             $message .= ': '.$details;
